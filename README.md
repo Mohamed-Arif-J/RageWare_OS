@@ -109,6 +109,49 @@ GitHub
 npm
 Nodemon
 
+Caught in 4K[live webapp Application in RageWare OS]
+[Languages used]
+Python (3.10+)
+JavaScript (ES6+)
+JSX
+HTML5
+CSS3
+
+[Frameworks used]
+React.js
+FastAPI
+PyTorch (CUDA / CPU acceleration)
+
+[Libraries used]
+Vision & NLP Models:
+Moondream2 (vikhyatk/moondream2)
+Qwen2.5-0.5B-Instruct (Qwen/Qwen2.5-0.5B-Instruct)
+Sentence-Transformers (all-MiniLM-L6-v2)
+Machine Learning & Core:
+Hugging Face transformers
+accelerate
+einops
+numpy
+
+Backend Utilities:
+uvicorn
+Pillow (PIL - Python Imaging Library)
+python-multipart
+requests
+pydantic
+Frontend Packages:
+react-webcam
+axios
+
+[Tools & Infrastructure used]
+Vite
+@vitejs/plugin-react
+Modal (Serverless GPU Cloud Runtime)
+Git
+GitHub
+MediaDevices / getUserMedia API (Webcam optical frame buffer)
+Canvas / Blob URL Object APIs
+Windows 95/98 Design System (Authentic Retro OS styling)
 
 
 Implementation
