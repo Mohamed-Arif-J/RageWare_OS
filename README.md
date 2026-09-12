@@ -178,8 +178,7 @@ other elements in the os like task manager, musics,videos ets
 
 ### Project Demo
 # Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
+https://drive.google.com/file/d/1niHrqr2EnIt1GPrBrRRqXgPCinyKPLRD/view?usp=sharing
 
 
 ## Team Contributions
