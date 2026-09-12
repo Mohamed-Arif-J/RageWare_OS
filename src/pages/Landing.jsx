@@ -324,7 +324,7 @@ export default function Landing({ onLaunchOS }) {
                   <li>⏳ <strong>Setup Wizard</strong>: Experience the infamous 99% progress stall</li>
                   <li>📈 <strong>System Monitor</strong>: Observe real-time CRT graphs &amp; rage metrics</li>
                   <li>👁️ <strong>Optical Sensor</strong>: Local MediaPipe real-time face telemetry</li>
-                  <li>📹 <strong>Caught In 4K</strong>: Live AI surveillance camera application (mohamed-arif-j--caught-in-4k-fastapi-app.modal.run)</li>
+                  <li>📹 <strong>Caught In 4K</strong>: Live AI surveillance camera application (mohamed-arif-j--caught-in-4k-caughtin4kserver-serve.modal.run)</li>
                   <li>🌐 <strong>Nothing as a Service™</strong>: Embedded retro IE5 browser portal delivering pure Nothing</li>
                   <li>🚗 <strong>Gesture Drive</strong>: Check native Windows protocol integration</li>
                 </ul>

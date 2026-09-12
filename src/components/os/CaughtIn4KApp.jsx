@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { soundEngine } from '../../engine/soundEngine';
 
-const CAUGHT_IN_4K_URL = 'https://mohamed-arif-j--caught-in-4k-fastapi-app.modal.run/';
+const CAUGHT_IN_4K_URL = 'https://mohamed-arif-j--caught-in-4k-caughtin4kserver-serve.modal.run/';
 
 export default function CaughtIn4KApp() {
   const iframeRef = useRef(null);
@@ -81,7 +81,7 @@ export default function CaughtIn4KApp() {
             <div className="naas-error-icon">📹</div>
             <div className="naas-error-title mono">Caught In 4K — Modal App</div>
             <div className="naas-error-msg mono">
-              The server at <strong>mohamed-arif-j--caught-in-4k-fastapi-app.modal.run</strong> could not be loaded inside the container, or the serverless instance is cold-starting.<br /><br />
+              The server at <strong>mohamed-arif-j--caught-in-4k-caughtin4kserver-serve.modal.run</strong> could not be loaded inside the container, or the serverless instance is cold-starting.<br /><br />
               Please retry or open the application directly in your browser.
             </div>
             <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
@@ -113,7 +113,7 @@ export default function CaughtIn4KApp() {
           {isLoading ? '⌛ Loading...' : loadError ? '✖ Standby' : '✔ Done'}
         </span>
         <span className="naas-status-center">
-          Caught In 4K — mohamed-arif-j--caught-in-4k-fastapi-app.modal.run
+          Caught In 4K — mohamed-arif-j--caught-in-4k-caughtin4kserver-serve.modal.run
         </span>
         <span className="naas-status-right">🌐 Internet Zone</span>
       </div>
