@@ -10,8 +10,8 @@
 
 
 ### Team Members
-- Team Lead: Mohamed Arif J - [Jawaharlal college of engineering aand technology]
-- Member 2: Adhil V T - [Jawaharlal college of engineering aand technology]
+- Team Lead: Mohamed Arif J - [Jawaharlal college of engineering and technology]
+- Member 2: Adhil V T - [Jawaharlal college of engineering and technology]
 
 ### Project Description
 **RAGEWARE** is an interactive, browser-based simulation of a retro 1990s desktop operating system (styled after Windows 95 and Windows 98). Rather than presenting separate, disjointed mini-games, **the operating system itself serves as the interactive environment**. As the user performs common computing tasks—such as browsing files, typing commands, running system updates, or adjusting settings—the system actively monitors user behavior and becomes progressively uncooperative, sarcastic, and hostile. 
