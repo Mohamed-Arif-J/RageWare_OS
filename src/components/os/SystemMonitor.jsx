@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { getRageProfile } from '../../engine/rageEngine';
+import { getRageProfile, increaseRage, RAGE_EVENTS } from '../../engine/rageEngine';
 import { osPersonalityInstance } from '../../engine/osPersonality';
+import { soundEngine } from '../../engine/soundEngine';
+import { mouseTracker } from '../../services/mouseTracker';
 
-export default function SystemMonitor({ openWindowsCount = 1, profile: propProfile }) {
+export default function SystemMonitor({
+  openWindowsCount = 1,
+  profile: propProfile,
+  windows = [],
+  onCloseWindow,
+  onOpenApp,
+  onClose,
+  isChaosMode = true,
+  onRageUpdate,
+}) {
   const [activeTab, setActiveTab] = useState('performance');
   const [cpuVal, setCpuVal] = useState(24);
   const [memVal, setMemVal] = useState(48);
@@ -10,16 +21,18 @@ export default function SystemMonitor({ openWindowsCount = 1, profile: propProfi
   const [cpuHistory, setCpuHistory] = useState([20, 25, 18, 30, 22, 19, 28, 24, 21, 26, 32, 28, 24]);
   // Step 7: Live-polling profile so data is never stale (fixes audit bug #4)
   const [profile, setProfile] = useState(() => propProfile || getRageProfile());
+  const [mouseTelemetry, setMouseTelemetry] = useState(() => mouseTracker.getTelemetry());
 
   useEffect(() => {
     if (propProfile) setProfile(propProfile);
   }, [propProfile]);
 
   useEffect(() => {
-    // Poll the rage profile every 1.5s so Rage Diagnostics tab stays live
+    // Poll the rage profile and mouse telemetry every 1s
     const profileTimer = setInterval(() => {
       setProfile(getRageProfile());
-    }, 1500);
+      setMouseTelemetry(mouseTracker.getTelemetry());
+    }, 1000);
 
     const timer = setInterval(() => {
       const nextCpu = Math.floor(16 + Math.random() * 20);
@@ -35,6 +48,106 @@ export default function SystemMonitor({ openWindowsCount = 1, profile: propProfi
     };
   }, []);
 
+  const [selectedProcessKey, setSelectedProcessKey] = useState('patience');
+  const [endProcessFeedback, setEndProcessFeedback] = useState('');
+
+  // Build live process table combining open windows and system threads
+  const windowProcesses = (windows || []).map((w, idx) => {
+    let imgName = 'APP.EXE';
+    if (w.appId === 'notepad') imgName = 'NOTEPAD.EXE';
+    else if (w.appId === 'terminal') imgName = 'COMMAND.COM';
+    else if (w.appId === 'file-manager') imgName = 'EXPLORER.EXE';
+    else if (w.appId === 'system-update') imgName = 'SETUP.EXE';
+    else if (w.appId === 'settings') imgName = 'CONTROL.EXE';
+    else if (w.appId === 'camera') imgName = 'VFW32.EXE';
+    else if (w.appId === 'caught-in-4k') imgName = 'IEXPLORE.EXE';
+    else if (w.appId === 'gesture-drive') imgName = 'GDRIVE.EXE';
+    else if (w.appId === 'naas') imgName = 'NAAS_SVC.EXE';
+    else if (w.appId === 'nobrowser') imgName = 'NOBROWSE.EXE';
+    else imgName = `${(w.appId || 'app').toUpperCase()}.EXE`;
+
+    return {
+      key: w.id,
+      name: imgName,
+      pid: 1000 + (idx * 42),
+      cpu: `${Math.max(1, (idx + 1) * 3)}%`,
+      mem: `${4000 + (idx * 1200)} K`,
+      isWindow: true,
+      windowId: w.id,
+      appId: w.appId,
+    };
+  });
+
+  const staticProcesses = [
+    { key: 'patience', name: 'PATIENCE.EXE', pid: '001', cpu: `${Math.max(0, 100 - (profile.rageScore || 0))}%`, mem: '64 K', isWindow: false },
+    { key: 'rageware', name: 'RAGEWARE.EXE', pid: '999', cpu: `${cpuVal}%`, mem: '18,420 K', isWindow: false },
+    { key: 'explorer', name: 'EXPLORER.SYS', pid: '100', cpu: '02%', mem: '8,912 K', isWindow: false },
+    { key: 'kernel', name: 'KERNEL32.DLL', pid: '004', cpu: '01%', mem: '2,140 K', isWindow: false },
+  ];
+
+  const allProcesses = [...windowProcesses, ...staticProcesses];
+
+  const handleEndProcess = () => {
+    const target = allProcesses.find((p) => p.key === selectedProcessKey);
+    if (!target) return;
+
+    soundEngine.playClick();
+
+    // 1. Ending an actual open window
+    if (target.isWindow && target.windowId) {
+      if (onCloseWindow) onCloseWindow(target.windowId);
+
+      if (!isChaosMode) {
+        soundEngine.playDing();
+        setEndProcessFeedback(`Process ${target.name} terminated cleanly.`);
+        return;
+      }
+
+      // Chaos Mode: Hydra Protocol retaliation!
+      soundEngine.playChord();
+      setEndProcessFeedback(`Terminated ${target.name}...`);
+
+      setTimeout(() => {
+        soundEngine.playExclamation();
+        setEndProcessFeedback(`⚠️ HYDRA PROTOCOL: ${target.name} multiplied into 2 threads!`);
+        if (onOpenApp && target.appId) {
+          onOpenApp(target.appId);
+          setTimeout(() => onOpenApp(target.appId), 600);
+        }
+      }, 1600);
+      return;
+    }
+
+    // 2. Ending PATIENCE.EXE
+    if (target.key === 'patience') {
+      soundEngine.playCriticalStop();
+      increaseRage(15, RAGE_EVENTS.INCORRECT_ACTION);
+      if (onRageUpdate) onRageUpdate();
+      alert('FATAL: You have killed PATIENCE.EXE.\nAll behavioral restraint has been permanently disengaged.');
+      setEndProcessFeedback('PATIENCE.EXE status: DEAD.');
+      return;
+    }
+
+    // 3. Ending RAGEWARE.EXE
+    if (target.key === 'rageware') {
+      soundEngine.playExclamation();
+      alert('RAGEWARE.EXE refused termination.\nIn retaliation, it has terminated System Monitor.');
+      if (onClose) onClose();
+      return;
+    }
+
+    // 4. Ending EXPLORER.SYS
+    if (target.key === 'explorer') {
+      soundEngine.playBoing();
+      setEndProcessFeedback('EXPLORER.SYS restarted due to user insubordination.');
+      return;
+    }
+
+    // Default
+    soundEngine.playExclamation();
+    alert('Process termination rejected by System Watchdog.');
+  };
+
   return (
     <div className="win95-tabbed-dialog" id="app-sysmon">
       {/* Notebook Tab Bar */}
@@ -49,7 +162,7 @@ export default function SystemMonitor({ openWindowsCount = 1, profile: propProfi
           className={`win95-tab-btn ${activeTab === 'processes' ? 'active' : ''}`}
           onClick={() => setActiveTab('processes')}
         >
-          Processes
+          Processes ({allProcesses.length})
         </button>
         <button
           className={`win95-tab-btn ${activeTab === 'rage' ? 'active' : ''}`}
@@ -99,84 +212,67 @@ export default function SystemMonitor({ openWindowsCount = 1, profile: propProfi
               </fieldset>
 
               <fieldset className="win95-fieldset">
-                <legend>Patience Index</legend>
+                <legend>Rage Acceleration</legend>
                 <div className="meter-wrapper">
                   <div className="win95-progressbar-track">
                     {Array.from({ length: 16 }).map((_, i) => (
                       <div
                         key={i}
-                        className={`win95-progressbar-block ${
-                          i < Math.round((profile.rageScore / 100) * 16) ? (profile.rageScore > 50 ? 'failed' : 'filled') : ''
-                        }`}
+                        className={`win95-progressbar-block ${(profile.rageScore || 0) > i * 6 ? 'filled danger' : ''}`}
                       />
                     ))}
                   </div>
                   <div className="meter-label">
-                    Rage: <strong>{profile.rageScore}%</strong> ({profile.level})
+                    Friction Factor: <strong>{(profile.rageScore || 0)}%</strong>
                   </div>
                 </div>
               </fieldset>
             </div>
-
-            {/* System Totals */}
-            <fieldset className="win95-fieldset">
-              <legend>Totals</legend>
-              <div className="sysmon-totals-grid">
-                <div>Handles: <strong>4,291</strong></div>
-                <div>Threads: <strong>{threads}</strong></div>
-                <div>Processes: <strong>{15 + openWindowsCount}</strong></div>
-                <div>Friction Events: <strong className="text-danger">{profile.frustrationEvents}</strong></div>
-              </div>
-            </fieldset>
           </div>
         )}
 
         {activeTab === 'processes' && (
           <div className="tab-pane">
-            <div className="win95-listview-frame">
+            <div className="win95-listview-frame" style={{ height: '220px', overflowY: 'auto' }}>
               <div className="listview-header">
-                <span style={{ width: '40%' }}>Image Name</span>
-                <span style={{ width: '20%' }}>PID</span>
+                <span style={{ width: '45%' }}>Image Name</span>
+                <span style={{ width: '15%' }}>PID</span>
                 <span style={{ width: '20%' }}>CPU</span>
                 <span style={{ width: '20%' }}>Mem Usage</span>
               </div>
               <div className="listview-rows">
-                <div className="listview-row selected">
-                  <span style={{ width: '40%' }}>RAGEWARE.EXE</span>
-                  <span style={{ width: '20%' }}>1044</span>
-                  <span style={{ width: '20%' }}>{cpuVal - 8}%</span>
-                  <span style={{ width: '20%' }}>18,420 K</span>
-                </div>
-                <div className="listview-row">
-                  <span style={{ width: '40%' }}>EXPLORER.EXE</span>
-                  <span style={{ width: '20%' }}>842</span>
-                  <span style={{ width: '20%' }}>02%</span>
-                  <span style={{ width: '20%' }}>8,912 K</span>
-                </div>
-                <div className="listview-row">
-                  <span style={{ width: '40%' }}>KERNEL32.SYS</span>
-                  <span style={{ width: '20%' }}>004</span>
-                  <span style={{ width: '20%' }}>03%</span>
-                  <span style={{ width: '20%' }}>2,140 K</span>
-                </div>
-                <div className="listview-row">
-                  <span style={{ width: '40%' }}>EVASIVE_SVC.EXE</span>
-                  <span style={{ width: '20%' }}>608</span>
-                  <span style={{ width: '20%' }}>05%</span>
-                  <span style={{ width: '20%' }}>4,310 K</span>
-                </div>
-                <div className="listview-row">
-                  <span style={{ width: '40%' }}>SPOOL32.EXE</span>
-                  <span style={{ width: '20%' }}>312</span>
-                  <span style={{ width: '20%' }}>00%</span>
-                  <span style={{ width: '20%' }}>1,024 K</span>
-                </div>
+                {allProcesses.map((proc) => (
+                  <div
+                    key={proc.key}
+                    className={`listview-row ${selectedProcessKey === proc.key ? 'selected' : ''}`}
+                    onClick={() => setSelectedProcessKey(proc.key)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <span style={{ width: '45%', fontWeight: proc.isWindow ? 'bold' : 'normal' }}>
+                      {proc.isWindow ? '🗔 ' : '⚙️ '}{proc.name}
+                    </span>
+                    <span style={{ width: '15%' }}>{proc.pid}</span>
+                    <span style={{ width: '20%' }}>{proc.cpu}</span>
+                    <span style={{ width: '20%' }}>{proc.mem}</span>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="pane-btn-row">
+
+            {endProcessFeedback && (
+              <div className="sysmon-feedback-note" style={{ fontSize: '11px', color: '#B00000', margin: '4px 0', fontWeight: 'bold' }}>
+                {endProcessFeedback}
+              </div>
+            )}
+
+            <div className="pane-btn-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+              <span style={{ fontSize: '10px', color: '#555' }}>
+                Selected: <strong>{selectedProcessKey}</strong>
+              </span>
               <button
                 className="win95-btn"
-                onClick={() => alert('Access Denied: Protected system process.')}
+                onClick={handleEndProcess}
+                style={{ fontWeight: 'bold' }}
               >
                 End Process
               </button>
@@ -310,6 +406,21 @@ export default function SystemMonitor({ openWindowsCount = 1, profile: propProfi
                     </>
                   );
                 })()}
+              </div>
+            </fieldset>
+
+            {/* Live Biometric & Ergonomic Tracking */}
+            <fieldset className="win95-fieldset" style={{ marginTop: '6px' }}>
+              <legend>OPTICAL & MOUSE ERGONOMIC TELEMETRY</legend>
+              <div style={{ fontFamily: 'monospace', fontSize: '11px', background: '#000', color: '#00ff66', padding: '8px', border: '1px solid #555' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 10px', color: '#ccc' }}>
+                  <div>Optical Sensor : <strong style={{ color: profile.isCameraActive ? '#00ff66' : '#888' }}>{profile.isCameraActive ? 'ONLINE (TRACKING)' : 'OFFLINE'}</strong></div>
+                  <div>Reaction Window: <strong style={{ color: '#00e5ff' }}>{profile.reactionWindow || 'MONITORING'}</strong></div>
+                  <div>Cursor Velocity: <strong style={{ color: '#00e5ff' }}>{mouseTelemetry?.speed || 0} px/ms</strong></div>
+                  <div>Mouse Jitter   : <strong style={{ color: mouseTelemetry?.isShaking ? '#ff4444' : '#00ff66' }}>{mouseTelemetry?.shakeScore || 0}% {mouseTelemetry?.isShaking ? '⚠️ (SHAKING)' : ''}</strong></div>
+                  <div>Click Rate     : <strong style={{ color: (mouseTelemetry?.clickRate || 0) > 3 ? '#ffaa00' : '#ccc' }}>{mouseTelemetry?.clickRate || 0} / sec</strong></div>
+                  <div>Total Clicks   : <strong style={{ color: '#ccc' }}>{mouseTelemetry?.totalClicks || 0}</strong></div>
+                </div>
               </div>
             </fieldset>
           </div>

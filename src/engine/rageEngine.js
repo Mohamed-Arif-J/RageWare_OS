@@ -54,10 +54,38 @@ export const RAGE_EVENTS = {
   // Cooldown / Success
   SUCCESSFUL_ACTION: 'successfulAction',
 
-  // Step 4: Optical Visual Signals (Contextual to failure reaction windows only)
+  // Step 4: Optical Visual Signals & Expression Tracking
   FACIAL_REACTION: 'facialReaction',
   RAPID_HEAD_MOVEMENT: 'rapidHeadMovement',
   STRONG_FACIAL_ACTIVITY: 'strongFacialActivity',
+  FACIAL_AGITATION: 'facialAgitation',
+  HEAD_SHAKE: 'headShake',
+
+  // Mouse Ergonomics & Rage Tracking
+  ERRATIC_MOUSE: 'erraticMouse',
+  RAPID_CLICKING: 'rapidClicking',
+
+  // Part 2: Calculator Events
+  CALCULATOR_BUTTON_ESCAPE: 'calculatorButtonEscape',
+  CALCULATOR_FAKE_ERROR: 'calculatorFakeError',
+  CALCULATOR_DELAYED_RESULT: 'calculatorDelayedResult',
+  CALCULATOR_INTERACTION_TRAP: 'calculatorInteractionTrap',
+
+  // Part 3: Fake Lock Events
+  FAKE_LOCK: 'fakeLock',
+  LOCK_PASSWORD_TRAP: 'lockPasswordTrap',
+  LOCK_BUTTON_ESCAPE: 'lockButtonEscape',
+  LOCK_ACCESS_DENIED: 'lockAccessDenied',
+
+  // Part 4: Calendar Events
+  CALENDAR_NAVIGATION_TRAP: 'calendarNavigationTrap',
+  CALENDAR_FAKE_APPOINTMENT: 'calendarFakeAppointment',
+  CALENDAR_INTERACTION_TRAP: 'calendarInteractionTrap',
+  CALENDAR_DATE_MOCK: 'calendarDateMock',
+  CALENDAR_TODAY_MOCK: 'calendarTodayMock',
+  CALENDAR_REPEATED_INTERACTION: 'calendarRepeatedInteraction',
+  CALENDAR_STATUS_MOCK: 'calendarStatusMock',
+  CALENDAR_DELAYED_NAVIGATION: 'calendarDelayedNavigation',
 };
 
 // Event to category & default weight mapping
@@ -76,10 +104,38 @@ const EVENT_CONFIG = {
   [RAGE_EVENTS.CHALLENGE_TIMEOUT]: { category: FRUSTRATION_CATEGORIES.TIMING, delta: 12 },
   [RAGE_EVENTS.INCORRECT_ACTION]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 10 },
   [RAGE_EVENTS.SUCCESSFUL_ACTION]: { category: null, delta: -6 },
-  // Subtle optical adjustments (+2 to +3)
-  [RAGE_EVENTS.FACIAL_REACTION]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 2 },
-  [RAGE_EVENTS.RAPID_HEAD_MOVEMENT]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 2 },
-  [RAGE_EVENTS.STRONG_FACIAL_ACTIVITY]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 3 },
+  // Optical adjustments
+  [RAGE_EVENTS.FACIAL_REACTION]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 7 },
+  [RAGE_EVENTS.RAPID_HEAD_MOVEMENT]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 5 },
+  [RAGE_EVENTS.STRONG_FACIAL_ACTIVITY]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 6 },
+  [RAGE_EVENTS.FACIAL_AGITATION]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 4 },
+  [RAGE_EVENTS.HEAD_SHAKE]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 5 },
+
+  // Mouse adjustments
+  [RAGE_EVENTS.ERRATIC_MOUSE]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 6 },
+  [RAGE_EVENTS.RAPID_CLICKING]: { category: FRUSTRATION_CATEGORIES.MOVING_BUTTONS, delta: 8 },
+
+  // Calculator Events
+  [RAGE_EVENTS.CALCULATOR_BUTTON_ESCAPE]: { category: FRUSTRATION_CATEGORIES.MOVING_BUTTONS, delta: 6 },
+  [RAGE_EVENTS.CALCULATOR_FAKE_ERROR]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 8 },
+  [RAGE_EVENTS.CALCULATOR_DELAYED_RESULT]: { category: FRUSTRATION_CATEGORIES.FAKE_LOADING, delta: 6 },
+  [RAGE_EVENTS.CALCULATOR_INTERACTION_TRAP]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 6 },
+
+  // Lock Events
+  [RAGE_EVENTS.FAKE_LOCK]: { category: FRUSTRATION_CATEGORIES.TIMING, delta: 6 },
+  [RAGE_EVENTS.LOCK_PASSWORD_TRAP]: { category: FRUSTRATION_CATEGORIES.WINDOW_MANIPULATION, delta: 8 },
+  [RAGE_EVENTS.LOCK_BUTTON_ESCAPE]: { category: FRUSTRATION_CATEGORIES.MOVING_BUTTONS, delta: 6 },
+  [RAGE_EVENTS.LOCK_ACCESS_DENIED]: { category: FRUSTRATION_CATEGORIES.FILE_INTERACTION, delta: 8 },
+
+  // Calendar Events (Small, calibrated friction contributions)
+  [RAGE_EVENTS.CALENDAR_NAVIGATION_TRAP]: { category: FRUSTRATION_CATEGORIES.TIMING, delta: 3 },
+  [RAGE_EVENTS.CALENDAR_FAKE_APPOINTMENT]: { category: FRUSTRATION_CATEGORIES.FILE_INTERACTION, delta: 2 },
+  [RAGE_EVENTS.CALENDAR_INTERACTION_TRAP]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 2 },
+  [RAGE_EVENTS.CALENDAR_DATE_MOCK]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 1 },
+  [RAGE_EVENTS.CALENDAR_TODAY_MOCK]: { category: FRUSTRATION_CATEGORIES.TIMING, delta: 1 },
+  [RAGE_EVENTS.CALENDAR_REPEATED_INTERACTION]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 1 },
+  [RAGE_EVENTS.CALENDAR_STATUS_MOCK]: { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 1 },
+  [RAGE_EVENTS.CALENDAR_DELAYED_NAVIGATION]: { category: FRUSTRATION_CATEGORIES.TIMING, delta: 2 },
 };
 
 const createInitialCategories = () => ({
@@ -94,8 +150,8 @@ const createInitialCategories = () => ({
 });
 
 const createInitialSessionState = () => ({
-  rageScore: 12, // subtle starting baseline for realistic feel
-  calmScore: 88,
+  rageScore: 0, // Clean 0 baseline for authentic trust
+  calmScore: 100,
   frustrationEvents: 0,
   successfulChallenges: 0,
   failedChallenges: 0,
@@ -107,11 +163,66 @@ const createInitialSessionState = () => ({
 
 // Active in-memory session state
 let session = createInitialSessionState();
+let isSafeMode = false;
+
+export function setSafeMode(enabled) {
+  isSafeMode = Boolean(enabled);
+  if (isSafeMode) {
+    session.rageScore = 0;
+    session.calmScore = maxTolerableRage;
+    activeReactionWindow = null;
+  }
+}
+
+export function isEngineSafeMode() {
+  return isSafeMode;
+}
+
+// Configurable Calibration Parameters (modifiable via Control Panel)
+let maxTolerableRage = 100;
+let emotionalDecayRate = -0.5; // pts / sec
+let frustrationMultiplier = 1.25;
+
+export function setMaxTolerableRage(max) {
+  maxTolerableRage = Math.max(20, Math.min(300, Number(max) || 100));
+}
+
+export function getMaxTolerableRage() {
+  return maxTolerableRage;
+}
+
+export function setEmotionalDecayRate(rate) {
+  emotionalDecayRate = Number(rate) || 0;
+}
+
+export function getEmotionalDecayRate() {
+  return emotionalDecayRate;
+}
+
+export function setFrustrationMultiplier(mult) {
+  frustrationMultiplier = Math.max(0.5, Math.min(5.0, Number(mult) || 1.0));
+}
+
+export function getFrustrationMultiplier() {
+  return frustrationMultiplier;
+}
+
+// Background emotional decay heartbeat
+if (typeof window !== 'undefined' && !window.__rageware_decay_started) {
+  window.__rageware_decay_started = true;
+  setInterval(() => {
+    if (emotionalDecayRate !== 0 && session.rageScore > 0) {
+      const change = emotionalDecayRate * 2;
+      session.rageScore = clamp(session.rageScore + change, 0, maxTolerableRage);
+      session.calmScore = Math.max(0, maxTolerableRage - session.rageScore);
+    }
+  }, 2000);
+}
 
 /**
  * Ensures value is a valid clamped number between min and max.
  */
-function clamp(val, min = 0, max = 100) {
+function clamp(val, min = 0, max = maxTolerableRage) {
   if (typeof val !== 'number' || Number.isNaN(val) || !Number.isFinite(val)) {
     return min;
   }
@@ -210,41 +321,116 @@ export function getActiveReactionWindow() {
   return activeReactionWindow;
 }
 
+let lastDiagnostic = {
+  lastRageSource: 'initialization',
+  lastRageAmount: 0,
+  lastOpticalModifier: 0,
+  lastBehaviorModifier: 0,
+  recentEvent: 'System booted',
+};
+
+export function getDiagnostics() {
+  const isWindowActive = Boolean(activeReactionWindow && !activeReactionWindow.triggered && Date.now() <= activeReactionWindow.expiresAt);
+  return {
+    currentRage: session.rageScore,
+    rageLevel: getRageLevel().level,
+    isSafeMode,
+    lastRageSource: lastDiagnostic.lastRageSource,
+    lastRageAmount: lastDiagnostic.lastRageAmount,
+    lastOpticalModifier: lastDiagnostic.lastOpticalModifier,
+    lastBehaviorModifier: lastDiagnostic.lastBehaviorModifier,
+    recentEvent: lastDiagnostic.recentEvent,
+    reactionWindow: isWindowActive ? 'ACTIVE' : 'INACTIVE',
+    cameraActive: isCameraActive,
+  };
+}
+
+if (typeof window !== 'undefined') {
+  window.__RAGEWARE_DIAGNOSTICS__ = getDiagnostics;
+}
+
+let lastContinuousOpticalCheck = 0;
+
 /**
- * Process visual signals in the context of an active ragebait reaction window.
- * STRICT RULE: Avoid false rage. Never increases rage merely because camera is on or face is visible.
- * Only triggers if an active reaction window exists following a failure AND visual activity spikes above baseline!
+ * Process visual signals in the context of optical tracking and reaction windows.
+ * - In Safe Mode: 0 rage.
+ * - Reaction Window: detects furrowed brow, head shake, or high agitation during post-event windows.
+ * - Continuous: detects spontaneous furrowed brows / agitation (adds rage) or smiles (relieves rage).
  */
 export function processOpticalSignals(telemetry, baseline) {
-  if (!telemetry || !isCameraActive) return null;
+  if (!telemetry || !isCameraActive || isSafeMode) return null;
 
+  const now = Date.now();
   const reactionWindow = getActiveReactionWindow();
-  if (!reactionWindow || reactionWindow.triggered) return null;
 
-  const baseActivity = (baseline && typeof baseline.avgActivity === 'number') ? baseline.avgActivity : 0.12;
-  const currentActivity = telemetry.facialActivity || 0;
-  const isHeadFast = telemetry.headMovement === 'high';
-  const isMouthActive = telemetry.mouthOpen && currentActivity > 0.35;
+  // 1. Contextual Reaction Window (Immediate response after adversarial event)
+  if (reactionWindow && !reactionWindow.triggered) {
+    const isAnnoyedFace = telemetry.primaryExpression === 'FURROWED BROW (ANNOYED)' || (telemetry.eyebrowTension || 0) > 0.40;
+    const isHeadShaking = Boolean(telemetry.isHeadShaking);
+    const isHighActivity = (telemetry.facialActivity || 0) > (baseline?.avgActivity || 0.12) + 0.16;
+    const isAgitated = (telemetry.agitationScore || 0) > 55;
 
-  // Detect significant increase over baseline
-  if (currentActivity > baseActivity + 0.32 || isHeadFast || isMouthActive) {
-    reactionWindow.triggered = true;
-    const bonus = (isHeadFast && currentActivity > baseActivity + 0.4) ? 3 : 2;
-    const result = increaseRage(bonus, RAGE_EVENTS.FACIAL_REACTION);
+    if (isAnnoyedFace || isHeadShaking || isHighActivity || isAgitated) {
+      reactionWindow.triggered = true;
+      const bonus = isAnnoyedFace ? 7 : isHeadShaking ? 6 : 5;
+      const result = increaseRage(bonus, RAGE_EVENTS.FACIAL_REACTION);
 
-    session.challengeHistory.push({
-      type: RAGE_EVENTS.FACIAL_REACTION,
-      success: false,
-      rageChange: result.delta,
-      timestamp: Date.now(),
-      detail: `Optical reaction detected (+${result.delta} rage): activity ${(currentActivity * 100).toFixed(0)}% vs baseline ${(baseActivity * 100).toFixed(0)}%`,
-    });
+      lastDiagnostic.lastOpticalModifier = bonus;
+      lastDiagnostic.recentEvent = `Optical reaction (+${bonus} rage): ${telemetry.primaryExpression || 'Reaction'} during ${reactionWindow.triggerReason}`;
 
-    return {
-      triggered: true,
-      delta: result.delta,
-      newScore: result.newScore,
-    };
+      session.challengeHistory.push({
+        type: RAGE_EVENTS.FACIAL_REACTION,
+        success: false,
+        rageChange: result.delta,
+        timestamp: now,
+        detail: `Contextual optical reaction (+${result.delta} rage): ${telemetry.primaryExpression}, agitation ${telemetry.agitationScore}%`,
+      });
+
+      return {
+        triggered: true,
+        reason: 'reaction_window',
+        expression: telemetry.primaryExpression,
+        delta: result.delta,
+        newScore: result.newScore,
+      };
+    }
+  }
+
+  // 2. Continuous Tracking (Spontaneous facial frustration / smile calm)
+  if (now - lastContinuousOpticalCheck > 5000) {
+    lastContinuousOpticalCheck = now;
+
+    // A) Frustration / Annoyance detection: Furrowed brows, sustained agitation >= 60%
+    if ((telemetry.agitationScore || 0) >= 60 || telemetry.primaryExpression === 'FURROWED BROW (ANNOYED)' || telemetry.isHeadShaking) {
+      const delta = 4;
+      const result = increaseRage(delta, RAGE_EVENTS.FACIAL_AGITATION);
+      lastDiagnostic.lastOpticalModifier = delta;
+      lastDiagnostic.recentEvent = `Optical telemetry: ${telemetry.primaryExpression} detected (+${delta} rage)`;
+
+      return {
+        triggered: true,
+        reason: 'continuous_agitation',
+        expression: telemetry.primaryExpression,
+        delta: result.delta,
+        newScore: result.newScore,
+      };
+    }
+
+    // B) Positive expression / Smile detection: Calms user down slightly
+    if ((telemetry.smileApproximation || 0) > 0.55 && session.rageScore > 5) {
+      const calmDelta = -3;
+      session.rageScore = Math.max(0, session.rageScore + calmDelta);
+      session.calmScore = Math.min(maxTolerableRage, maxTolerableRage - session.rageScore);
+      lastDiagnostic.recentEvent = `Optical telemetry: Smile detected (${calmDelta} rage)`;
+
+      return {
+        triggered: true,
+        reason: 'smile_recovery',
+        expression: 'SMILING',
+        delta: calmDelta,
+        newScore: session.rageScore,
+      };
+    }
   }
 
   return null;
@@ -257,6 +443,9 @@ export function getRageProfile() {
   return {
     rageScore: session.rageScore,
     calmScore: session.calmScore,
+    maxRage: maxTolerableRage,
+    decayRate: emotionalDecayRate,
+    multiplier: frustrationMultiplier,
     level: getRageLevel().level,
     totalAttempts: session.totalAttempts,
     successfulChallenges: session.successfulChallenges,
@@ -269,6 +458,7 @@ export function getRageProfile() {
     challengeHistory: [...session.challengeHistory],
     isSessionComplete: isSessionComplete(),
     isCameraActive: isOpticalTrackingActive(),
+    isSafeMode,
   };
 }
 
@@ -277,17 +467,36 @@ export function getRageProfile() {
  * Requires rageScore >= 81 AND at least 10 meaningful interactions.
  */
 export function isSessionComplete() {
-  return session.rageScore >= 81 && session.meaningfulInteractions >= 10;
+  return session.rageScore >= (maxTolerableRage * 0.81) && session.meaningfulInteractions >= 10;
 }
 
 /**
  * Increases rage by a given amount and associates it with a reason or category.
  */
 export function increaseRage(amount = 10, reason = 'manual') {
-  const safeAmount = Math.max(0, typeof amount === 'number' && !Number.isNaN(amount) ? amount : 10);
+  // SAFE MODE: Genuine safety guarantee. Normal interaction, clicking, moving mouse never increases rage!
+  if (isSafeMode && !reason.includes('test') && reason !== 'manual') {
+    return {
+      delta: 0,
+      newScore: session.rageScore,
+      level: getRageLevel().level,
+    };
+  }
+
+  const isDirect =
+    reason === 'manual' ||
+    reason.includes('test') ||
+    reason.includes('control_panel') ||
+    reason === RAGE_EVENTS.FACIAL_REACTION ||
+    reason === RAGE_EVENTS.FACIAL_AGITATION ||
+    reason === RAGE_EVENTS.HEAD_SHAKE ||
+    reason === RAGE_EVENTS.ERRATIC_MOUSE ||
+    reason === RAGE_EVENTS.RAPID_CLICKING;
+  const effectiveAmount = isDirect ? amount : Math.round(amount * frustrationMultiplier);
+  const safeAmount = Math.max(0, typeof effectiveAmount === 'number' && !Number.isNaN(effectiveAmount) ? effectiveAmount : 10);
   const oldScore = session.rageScore;
-  session.rageScore = clamp(session.rageScore + safeAmount, 0, 100);
-  session.calmScore = 100 - session.rageScore;
+  session.rageScore = clamp(session.rageScore + safeAmount, 0, maxTolerableRage);
+  session.calmScore = Math.max(0, maxTolerableRage - session.rageScore);
   session.frustrationEvents += 1;
   session.meaningfulInteractions += 1;
 
@@ -296,6 +505,20 @@ export function increaseRage(amount = 10, reason = 'manual') {
   const targetCategory = eventDef ? eventDef.category : (session.categories[reason] !== undefined ? reason : null);
   if (targetCategory && session.categories[targetCategory] !== undefined) {
     session.categories[targetCategory] += safeAmount;
+  }
+
+  // Update diagnostic tracking
+  lastDiagnostic.lastRageSource = reason;
+  lastDiagnostic.lastRageAmount = session.rageScore - oldScore;
+  lastDiagnostic.recentEvent = getCategoryDisplayName(targetCategory || reason);
+
+  // If this was an adversarial failure/escape event, open a 2.5s optical reaction window!
+  const isSelfOptical =
+    reason === RAGE_EVENTS.FACIAL_REACTION ||
+    reason === RAGE_EVENTS.FACIAL_AGITATION ||
+    reason === RAGE_EVENTS.HEAD_SHAKE;
+  if (isCameraActive && !isSafeMode && !isSelfOptical && reason !== 'manual' && !reason.includes('test')) {
+    startOpticalReactionWindow(reason, 2500);
   }
 
   return {
@@ -311,8 +534,8 @@ export function increaseRage(amount = 10, reason = 'manual') {
 export function decreaseRage(amount = 5, reason = 'cooldown') {
   const safeAmount = Math.max(0, typeof amount === 'number' && !Number.isNaN(amount) ? amount : 5);
   const oldScore = session.rageScore;
-  session.rageScore = clamp(session.rageScore - safeAmount, 0, 100);
-  session.calmScore = 100 - session.rageScore;
+  session.rageScore = clamp(session.rageScore - safeAmount, 0, maxTolerableRage);
+  session.calmScore = Math.max(0, maxTolerableRage - session.rageScore);
 
   return {
     delta: session.rageScore - oldScore,
@@ -328,9 +551,9 @@ export function recordFailure(reason = RAGE_EVENTS.INCORRECT_ACTION) {
   session.totalAttempts += 1;
   session.failedChallenges += 1;
 
-  // Step 4: Open 2.6s optical reaction window to observe user's immediate visual reaction
-  if (isCameraActive) {
-    startOpticalReactionWindow(reason, 2600);
+  // Open 2.5s optical reaction window to observe user's immediate visual reaction
+  if (isCameraActive && !isSafeMode) {
+    startOpticalReactionWindow(reason, 2500);
   }
 
   const eventConfig = EVENT_CONFIG[reason] || { category: FRUSTRATION_CATEGORIES.PRECISION, delta: 10 };
@@ -374,5 +597,17 @@ export function recordSuccess(type = RAGE_EVENTS.SUCCESSFUL_ACTION) {
  */
 export function resetSession() {
   session = createInitialSessionState();
+  if (isSafeMode) {
+    session.rageScore = 0;
+    session.calmScore = maxTolerableRage;
+  }
+  activeReactionWindow = null;
+  lastDiagnostic = {
+    lastRageSource: 'reset',
+    lastRageAmount: 0,
+    lastOpticalModifier: 0,
+    lastBehaviorModifier: 0,
+    recentEvent: 'Session reset',
+  };
   return getRageProfile();
 }

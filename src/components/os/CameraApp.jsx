@@ -41,6 +41,7 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
     telemetry,
     landmarks,
     baseline,
+    recalibrate,
   } = useFaceTracking(videoRef, isStreaming);
 
   const canvasRef = useRef(null);
@@ -64,7 +65,7 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
 
   // Connect optical signals to Rage Engine during reaction windows (Only in Chaos Mode!)
   useEffect(() => {
-    if (!isChaosMode || !isStreaming || !telemetry) return;
+    if (!isChaosMode || !isStreaming || !telemetry || !baselineReady) return;
 
     // Check if optical reaction occurred
     const result = processOpticalSignals(telemetry, baseline);
@@ -78,19 +79,41 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
       }, 2200);
       return () => clearTimeout(timer);
     }
-  }, [telemetry, baseline, isStreaming, onRageUpdate]);
+  }, [telemetry, baseline, baselineReady, isStreaming, isChaosMode, onRageUpdate]);
 
   // Render subtle retro pixel landmarks onto canvas overlay
   useEffect(() => {
     const canvas = canvasRef.current;
+    const video = videoRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (!landmarks || !isStreaming) return;
+    if (!landmarks || !isStreaming || !video) return;
 
-    const w = canvas.width;
-    const h = canvas.height;
+    // Dynamically match canvas internal pixel resolution to its actual client dimensions
+    const cw = canvas.clientWidth || 480;
+    const ch = canvas.clientHeight || 220;
+    if (canvas.width !== cw || canvas.height !== ch) {
+      canvas.width = cw;
+      canvas.height = ch;
+    }
+
+    // Video stream intrinsic dimensions
+    const vw = video.videoWidth || 640;
+    const vh = video.videoHeight || 480;
+
+    // Calculate exact rendered video dimensions and offset inside container (object-fit: cover)
+    const scale = Math.max(cw / vw, ch / vh);
+    const renderW = vw * scale;
+    const renderH = vh * scale;
+    const offsetX = (cw - renderW) / 2;
+    const offsetY = (ch - renderH) / 2;
+
+    // Coordinate mapping functions from normalized landmark [0, 1] to exact canvas pixels:
+    // Video has CSS transform: scaleX(-1), so mirrored X is: offsetX + (1 - normX) * renderW
+    const toScreenX = (normX) => offsetX + (1 - normX) * renderW;
+    const toScreenY = (normY) => offsetY + normY * renderH;
 
     // Subtle face bounding box
     let minX = 1, minY = 1, maxX = 0, maxY = 0;
@@ -101,11 +124,19 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
       if (p.y > maxY) maxY = p.y;
     });
 
-    // Mirror X coordinates to match mirrored video feed
-    const boxX = (1 - maxX) * w;
-    const boxW = (maxX - minX) * w;
-    const boxY = minY * h;
-    const boxH = (maxY - minY) * h;
+    // Convert to screen coordinates with slight padding
+    const rawBoxLeft = toScreenX(maxX); // Mirrored: maxX in video is left on screen
+    const rawBoxRight = toScreenX(minX);
+    const rawBoxTop = toScreenY(minY);
+    const rawBoxBottom = toScreenY(maxY);
+
+    const padX = Math.max(4, (rawBoxRight - rawBoxLeft) * 0.04);
+    const padY = Math.max(4, (rawBoxBottom - rawBoxTop) * 0.04);
+
+    const boxX = Math.round(rawBoxLeft - padX);
+    const boxY = Math.round(rawBoxTop - padY);
+    const boxW = Math.round((rawBoxRight - rawBoxLeft) + padX * 2);
+    const boxH = Math.round((rawBoxBottom - rawBoxTop) + padY * 2);
 
     // Retro green/cyan tracking wireframe
     ctx.strokeStyle = '#00ff66';
@@ -113,7 +144,7 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
     ctx.strokeRect(boxX, boxY, boxW, boxH);
 
     // Corner brackets
-    const bracketSize = 10;
+    const bracketSize = 12;
     ctx.strokeStyle = '#ffff00';
     ctx.lineWidth = 2;
     // Top-left
@@ -141,26 +172,82 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
     ctx.lineTo(boxX + boxW, boxY + boxH - bracketSize);
     ctx.stroke();
 
-    // Subtle pixel landmark dots on key features (nose, lips, eyes)
+    // Draw connected facial wireframe contours
+    const drawContour = (indices, color = '#00ff66', close = false) => {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.3;
+      let first = true;
+      indices.forEach((idx) => {
+        const pt = landmarks[idx];
+        if (pt) {
+          const px = toScreenX(pt.x);
+          const py = toScreenY(pt.y);
+          if (first) {
+            ctx.moveTo(px, py);
+            first = false;
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+      });
+      if (close) ctx.closePath();
+      ctx.stroke();
+    };
+
+    // Dynamic eyebrow contour color: red if furrowed/tense, yellow if raised, cyan if resting
+    const browColor = (telemetry?.eyebrowTension || 0) > 0.40
+      ? '#ff3344'
+      : (telemetry?.eyebrowsRaised || telemetry?.primaryExpression?.includes('RAISED') ? '#ffff00' : '#00e5ff');
+
+    // Left Eyebrow arch (subject's right brow)
+    drawContour([70, 63, 105, 66, 107, 55, 65, 52, 53, 46], browColor);
+    // Right Eyebrow arch (subject's left brow)
+    drawContour([300, 293, 334, 296, 336, 285, 295, 282, 283, 276], browColor);
+    // Left Eye contour (subject's right eye, screen left)
+    drawContour([33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246], '#00ff66', true);
+    // Right Eye contour (subject's left eye, screen right)
+    drawContour([263, 249, 390, 373, 374, 380, 381, 382, 362, 398, 384, 385, 386, 387, 388, 466], '#00ff66', true);
+    // Nose bridge and tip (clean line stopping at bottom of nose, no mouth bleed)
+    drawContour([168, 6, 197, 195, 5, 4, 1, 2], '#ffff00');
+    // Nose nostril base
+    drawContour([98, 97, 2, 326, 327], '#ffff00');
+    // Lips contour (turns orange/red if agitation / tense)
+    const lipsColor = (telemetry?.agitationScore || 0) > 50 ? '#ff3344' : '#00ff66';
+    // Outer lips loop
+    drawContour([61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146], lipsColor, true);
+    // Inner lips opening loop
+    drawContour([78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95], lipsColor, true);
+
+    // Pixel landmark points
     ctx.fillStyle = '#00e5ff';
-    const keyIndices = [1, 10, 152, 13, 14, 61, 291, 33, 263, 70, 300];
+    const keyIndices = [1, 10, 152, 13, 14, 61, 291, 33, 263, 70, 300, 168];
     keyIndices.forEach((idx) => {
       const pt = landmarks[idx];
       if (pt) {
-        // Mirrored coordinate: (1 - pt.x) * w
-        const px = (1 - pt.x) * w;
-        const py = pt.y * h;
-        ctx.fillRect(px - 1.5, py - 1.5, 3, 3);
+        const px = toScreenX(pt.x);
+        const py = toScreenY(pt.y);
+        ctx.fillRect(Math.round(px - 1.5), Math.round(py - 1.5), 3, 3);
       }
     });
 
     // Tag above bounding box
     ctx.fillStyle = '#000000';
-    ctx.fillRect(boxX, Math.max(0, boxY - 16), 110, 14);
+    ctx.fillRect(boxX, Math.max(0, boxY - 18), 125, 16);
     ctx.fillStyle = '#00ff66';
-    ctx.font = '9px monospace';
-    ctx.fillText('FACE_0: TRACKING', boxX + 4, Math.max(10, boxY - 5));
-  }, [landmarks, isStreaming]);
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText('FACE_0: TRACKING', boxX + 4, Math.max(12, boxY - 6));
+
+    // Live Expression Banner below bounding box
+    const exprText = telemetry?.primaryExpression || 'TRACKING...';
+    const agText = `AGITATION: ${telemetry?.agitationScore || 0}%`;
+    const bannerY = Math.min(ch - 6, boxY + boxH + 18);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(boxX, boxY + boxH + 4, Math.max(boxW, 210), 18);
+    ctx.fillStyle = (telemetry?.agitationScore || 0) > 55 ? '#ff4444' : '#00e5ff';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText(`[${exprText}] [${agText}]`, boxX + 4, bannerY);
+  }, [landmarks, isStreaming, telemetry]);
 
   // Overall loading indicator
   const isLoading = isCamLoading || isModelLoading;
@@ -194,8 +281,6 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
           {/* Mirrored Canvas Overlay for Face Wireframe */}
           <canvas
             ref={canvasRef}
-            width={480}
-            height={360}
             className="camera-canvas-overlay"
             style={{ display: isStreaming ? 'block' : 'none' }}
           />
@@ -292,7 +377,7 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
         <div className="camera-telemetry-panel">
           {/* Telemetry Grid */}
           <fieldset className="win95-fieldset">
-            <legend>Optical Telemetry</legend>
+            <legend>Optical Telemetry & Expression Analysis</legend>
             <div className="telemetry-grid">
               <div className="telemetry-row">
                 <span className="telemetry-label">OPTICAL STATUS:</span>
@@ -302,35 +387,71 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
               </div>
 
               <div className="telemetry-row">
-                <span className="telemetry-label">FACE:</span>
-                <span className="telemetry-val">
-                  {telemetry.faceDetected ? 'DETECTED' : 'SEARCHING...'}
+                <span className="telemetry-label">EXPRESSION:</span>
+                <span
+                  className="telemetry-val"
+                  style={{
+                    fontWeight: 'bold',
+                    color:
+                      telemetry.primaryExpression?.includes('ANNOYED') || telemetry.primaryExpression?.includes('DISAPPROVAL')
+                        ? '#cc0000'
+                        : telemetry.primaryExpression?.includes('SMILING')
+                        ? '#008800'
+                        : '#0000aa',
+                  }}
+                >
+                  {telemetry.faceDetected ? (telemetry.primaryExpression || 'NEUTRAL') : 'SEARCHING...'}
                 </span>
               </div>
 
               <div className="telemetry-row">
-                <span className="telemetry-label">FACES COUNT:</span>
-                <span className="telemetry-val">{telemetry.facesCount}</span>
-              </div>
-
-              <div className="telemetry-row">
-                <span className="telemetry-label">HEAD MOVEMENT:</span>
-                <span className={`telemetry-val val-${telemetry.headMovement}`}>
-                  {telemetry.headMovement.toUpperCase()}
+                <span className="telemetry-label">AGITATION INDEX:</span>
+                <span className="telemetry-val font-mono" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div
+                    className="sunken"
+                    style={{
+                      width: '60px',
+                      height: '10px',
+                      background: '#fff',
+                      display: 'inline-block',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${telemetry.agitationScore || 0}%`,
+                        height: '100%',
+                        background: (telemetry.agitationScore || 0) > 60 ? '#ff3333' : (telemetry.agitationScore || 0) > 30 ? '#ffaa00' : '#00aa44',
+                      }}
+                    />
+                  </div>
+                  <strong>{telemetry.agitationScore || 0}%</strong>
                 </span>
               </div>
 
               <div className="telemetry-row">
-                <span className="telemetry-label">MOUTH ACTIVITY:</span>
-                <span className="telemetry-val">
-                  {telemetry.mouthOpen ? 'OPEN (ACTIVE)' : 'CLOSED (NORMAL)'}
-                </span>
-              </div>
-
-              <div className="telemetry-row">
-                <span className="telemetry-label">FACIAL ACTIVITY:</span>
+                <span className="telemetry-label">EYEBROW TENSION:</span>
                 <span className="telemetry-val font-mono">
-                  {Math.round(telemetry.facialActivity * 100)}%
+                  {Math.round((telemetry.eyebrowTension || 0) * 100)}%{' '}
+                  {telemetry.eyebrowTension > 0.40
+                    ? '⚠️ (FURROWED)'
+                    : telemetry.eyebrowsRaised || telemetry.primaryExpression?.includes('RAISED')
+                    ? '▲ (RAISED)'
+                    : '(RELAXED)'}
+                </span>
+              </div>
+
+              <div className="telemetry-row">
+                <span className="telemetry-label">HEAD MOTION:</span>
+                <span className={`telemetry-val val-${telemetry.headMovement}`}>
+                  {telemetry.isHeadShaking ? '⚠️ SHAKING (DISAPPROVAL)' : (telemetry.headMovement || 'LOW').toUpperCase()}
+                </span>
+              </div>
+
+              <div className="telemetry-row">
+                <span className="telemetry-label">MOUTH / JAW:</span>
+                <span className="telemetry-val">
+                  {telemetry.mouthOpen ? 'OPEN (EXASPERATED)' : (telemetry.smileApproximation > 0.45 ? 'SMILING' : 'CLOSED (RESTING)')}
                 </span>
               </div>
             </div>
@@ -357,6 +478,20 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
               </button>
             )}
 
+            {isStreaming && (
+              <button
+                id="btn-camera-recalibrate"
+                className="win95-btn"
+                onClick={() => {
+                  soundEngine.playDing?.() || soundEngine.playClick();
+                  recalibrate();
+                }}
+                title="Recalibrate your neutral resting face"
+              >
+                🎯 Recalibrate
+              </button>
+            )}
+
             <button
               className="win95-btn"
               onClick={() => {
@@ -364,8 +499,8 @@ export default function CameraApp({ onRageUpdate, autoStart = true, isChaosMode 
                 alert(
                   'OPTICAL SENSOR DRIVER INFO\n\n' +
                   'Driver: RAGE_VFW32.DRV (DirectShow / MediaPipe)\n' +
-                  'Model: MediaPipe FaceLandmarker v1.0.1 (Local Browser WASM)\n' +
-                  'Format: 640x480, 24-bit RGB (audio: false)\n' +
+                  'Model: MediaPipe FaceLandmarker (Local Browser WASM)\n' +
+                  'Tracking: Dynamic Eyebrow Contraction, Head Jitter & Agitation Index\n' +
                   'Privacy: 100% In-Memory. No frames or biometric data are ever stored or uploaded.'
                 );
               }}

@@ -9,7 +9,16 @@ import {
   IconCamera,
   IconCaughtIn4K,
   IconGestureDrive,
-  IconNaaS
+  IconNaaS,
+  IconNotepad,
+  IconBattery,
+  IconCalculator,
+  IconPaint,
+  IconRecycleBin,
+  IconMail,
+  IconLock,
+  IconCalendar,
+  IconBrowser
 } from './OSIcons';
 import { getRageProfile } from '../../engine/rageEngine';
 
@@ -39,6 +48,10 @@ export default function StartMenu({
         <div 
           className="start-menu-row with-submenu"
           onMouseEnter={() => setActiveSubmenu('programs')}
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveSubmenu((prev) => (prev === 'programs' ? null : 'programs'));
+          }}
         >
           <div className="start-row-content">
             <IconFolder size={18} />
@@ -48,6 +61,13 @@ export default function StartMenu({
 
           {activeSubmenu === 'programs' && (
             <div className="win95-submenu raised">
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('rageware-mail'); onClose(); }}
+              >
+                <IconMail size={16} />
+                <span><strong>RAGEWARE Mail</strong></span>
+              </div>
               <div 
                 className="start-menu-row"
                 onClick={() => { onLaunchApp('file-manager'); onClose(); }}
@@ -104,6 +124,62 @@ export default function StartMenu({
               >
                 <IconNaaS size={16} />
                 <span>Nothing as a Service™</span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('nobrowser'); onClose(); }}
+              >
+                <IconBrowser size={16} />
+                <span><strong>NOBROWSE™</strong></span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('notepad'); onClose(); }}
+              >
+                <IconNotepad size={16} />
+                <span>Notepad</span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('calculator'); onClose(); }}
+              >
+                <IconCalculator size={16} />
+                <span>Calculator</span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('calendar'); onClose(); }}
+              >
+                <IconCalendar size={16} />
+                <span>Calendar</span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('paint'); onClose(); }}
+              >
+                <IconPaint size={16} />
+                <span>Paint</span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('recycle-bin'); onClose(); }}
+              >
+                <IconRecycleBin size={16} />
+                <span>Recycle Bin</span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('battery-alert'); onClose(); }}
+              >
+                <IconBattery size={16} />
+                <span>Battery Monitor</span>
+              </div>
+              <div 
+                className="start-menu-row"
+                onClick={() => { onLaunchApp('lock'); onClose(); }}
+              >
+                <IconLock size={16} />
+                <span>System Lock</span>
               </div>
             </div>
           )}
@@ -194,6 +270,18 @@ export default function StartMenu({
           <div className="start-row-content">
             <span style={{ color: '#c00000', fontWeight: 'bold' }}>&#9888;</span>
             <span><u>V</u>erify Security...</span>
+          </div>
+        </div>
+
+        {/* Fake Lock Workstation */}
+        <div 
+          className="start-menu-row"
+          onMouseEnter={() => setActiveSubmenu(null)}
+          onClick={() => { onLaunchApp('lock'); onClose(); }}
+        >
+          <div className="start-row-content">
+            <IconLock size={18} />
+            <span><u>K</u>ey Lock Session...</span>
           </div>
         </div>
 

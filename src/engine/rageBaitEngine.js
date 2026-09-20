@@ -51,6 +51,9 @@ export const RAGEBAIT_EVENT_TYPES = {
   GHOST_CURSOR: 'ghostCursor',
   CURSOR_BUSY: 'cursorBusy',
   WINDOW_NUDGE: 'windowNudge',
+  MANDATORY_EULA: 'mandatoryEula',
+  BATTERY_CRITICAL: 'batteryCritical',
+  HARDWARE_DISCONNECT: 'hardwareDisconnect',
 };
 
 // Rich Windows 95/98 Notification Catalog (minor events — always notifications)
@@ -516,16 +519,74 @@ export const EVENT_REGISTRY = [
       };
     },
   },
+  {
+    id: RAGEBAIT_EVENT_TYPES.MANDATORY_EULA,
+    type: RAGEBAIT_EVENT_TYPES.MANDATORY_EULA,
+    category: 'timing',
+    minimumRage: 20,
+    baseWeight: 22,
+    cooldown: 28000,
+    duration: 10000,
+    severity: 'high',
+    isMajor: true,
+    execute: () => ({
+      type: RAGEBAIT_EVENT_TYPES.MANDATORY_EULA,
+      id: `eula-${Date.now()}`,
+    }),
+  },
+  {
+    id: RAGEBAIT_EVENT_TYPES.BATTERY_CRITICAL,
+    type: RAGEBAIT_EVENT_TYPES.BATTERY_CRITICAL,
+    category: 'fakeLoading',
+    minimumRage: 25,
+    baseWeight: 20,
+    cooldown: 32000,
+    duration: 11000,
+    severity: 'critical',
+    isMajor: true,
+    execute: () => ({
+      type: RAGEBAIT_EVENT_TYPES.BATTERY_CRITICAL,
+      id: `battery-${Date.now()}`,
+    }),
+  },
+  {
+    id: RAGEBAIT_EVENT_TYPES.HARDWARE_DISCONNECT,
+    type: RAGEBAIT_EVENT_TYPES.HARDWARE_DISCONNECT,
+    category: 'precision',
+    minimumRage: 10,
+    baseWeight: 28,
+    cooldown: 16000,
+    duration: 600,
+    severity: 'medium',
+    isMajor: false,
+    execute: () => ({
+      type: RAGEBAIT_EVENT_TYPES.HARDWARE_DISCONNECT,
+      id: `hwdis-${Date.now()}`,
+    }),
+  },
 ];
 
 /**
  * Dynamic Cooldown Ranges:
  * Chaos Mode: 2.5-5s for rapid but not overwhelming pacing.
  * Standard Mode: Tiered ranges based on rage score.
+ * Intensity setting ('LOW', 'NORMAL', 'CHAOTIC', 'SAFE') modulates pacing.
  */
-export function calculateNextCooldown(rageScore = 0, isChaosMode = true) {
+export function calculateNextCooldown(rageScore = 0, isChaosMode = true, intensity = 'CHAOTIC') {
+  if (intensity === 'SAFE' || !isChaosMode) {
+    return 99999999;
+  }
+
+  if (intensity === 'LOW') {
+    return Math.round(20000 + Math.random() * 20000); // 20s - 40s
+  }
+
+  if (intensity === 'NORMAL') {
+    return Math.round(10000 + Math.random() * 12000); // 10s - 22s
+  }
+
+  // CHAOTIC / Aggressive:
   if (isChaosMode) {
-    // Chaos mode: fast but not overwhelming — 2.5-5 seconds
     return Math.round(2500 + Math.random() * 2500);
   }
 
@@ -766,6 +827,8 @@ class RageBaitEngine {
     this.timerId = null;
     this.isRunning = false;
     this.isChaosMode = true;
+    this.intensity = 'CHAOTIC'; // 'LOW' | 'NORMAL' | 'CHAOTIC' | 'SAFE'
+    this.adaptiveLearning = true;
     this.recentEventIds = [];
     this.eventCount = 0;
     this.tracker = new UserBehaviorTracker(this);
@@ -778,6 +841,22 @@ class RageBaitEngine {
     }
   }
 
+  setIntensity(level) {
+    this.intensity = level;
+    if (level === 'SAFE') {
+      this.setChaosMode(false);
+    } else {
+      this.setChaosMode(true);
+      if (!this.isRunning) {
+        this.start(true);
+      }
+    }
+  }
+
+  setAdaptiveLearning(enabled) {
+    this.adaptiveLearning = Boolean(enabled);
+  }
+
   subscribe(listener) {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
@@ -785,7 +864,7 @@ class RageBaitEngine {
 
   dispatch(eventPayload) {
     if (!eventPayload) return;
-    if (!this.isChaosMode) return; // ABSOLUTE SILENCE in Safe Mode!
+    if (!this.isChaosMode || this.intensity === 'SAFE') return; // ABSOLUTE SILENCE in Safe Mode!
 
     this.recentEventIds.push(eventPayload.type);
     if (this.recentEventIds.length > 5) this.recentEventIds.shift();
@@ -802,11 +881,13 @@ class RageBaitEngine {
   }
 
   scheduleNext(initialDelay = null, isLooping = true) {
-    if (!this.isRunning || !this.isChaosMode) return;
+    if (!this.isRunning || !this.isChaosMode || this.intensity === 'SAFE') return;
     if (this.timerId) clearTimeout(this.timerId);
 
     const profile = getRageProfile();
-    const cooldownMs = initialDelay !== null ? initialDelay : calculateNextCooldown(profile.rageScore, this.isChaosMode);
+    const cooldownMs = initialDelay !== null 
+      ? initialDelay 
+      : calculateNextCooldown(profile.rageScore, this.isChaosMode, this.intensity);
 
     this.timerId = setTimeout(() => {
       if (!this.isRunning || !this.isChaosMode) return;

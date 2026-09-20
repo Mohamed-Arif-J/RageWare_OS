@@ -1,9 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IconCpu } from './OSIcons';
 import { soundEngine } from '../../engine/soundEngine';
 
 export default function ShutdownDialog({ isOpen = false, onConfirm, onCancel }) {
   const [selectedAction, setSelectedAction] = useState('shutdown'); // 'shutdown' | 'restart' | 'dos'
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        soundEngine.playClick();
+        if (onCancel) onCancel();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        soundEngine.playClick();
+        if (onConfirm) onConfirm(selectedAction);
+      } else if (e.key.toLowerCase() === 's') {
+        soundEngine.playClick();
+        setSelectedAction('shutdown');
+      } else if (e.key.toLowerCase() === 'r') {
+        soundEngine.playClick();
+        setSelectedAction('restart');
+      } else if (e.key.toLowerCase() === 'm') {
+        soundEngine.playClick();
+        setSelectedAction('dos');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, selectedAction, onConfirm, onCancel]);
 
   if (!isOpen) return null;
 

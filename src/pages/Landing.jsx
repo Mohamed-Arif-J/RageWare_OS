@@ -7,7 +7,12 @@ import {
   IconFolder, 
   IconTerminal, 
   IconCaughtIn4K, 
-  IconNaaS 
+  IconNaaS,
+  IconBrowser,
+  IconMail,
+  IconPaint,
+  IconNotepad,
+  IconGestureDrive
 } from '../components/os/OSIcons';
 import { soundEngine } from '../engine/soundEngine';
 
@@ -43,7 +48,7 @@ export default function Landing({ onLaunchOS }) {
             <IconRage size={18} />
           </div>
           <span className="landing-brand-title mono">RAGEWARE OS</span>
-          <span className="landing-build-tag mono">LAB-BUILD v0.9.5</span>
+          <span className="landing-build-tag mono">LAB-BUILD v0.9.8</span>
         </div>
 
         {/* Center Prominent Team AltF4 Pill Badge */}
@@ -94,9 +99,9 @@ export default function Landing({ onLaunchOS }) {
             <div className="disclaimer-body">
               <p>
                 <strong>Notice to Faculty Evaluators &amp; Users:</strong> All native applications 
-                (<em>File Manager, MS-DOS Prompt, Setup Wizard, System Monitor, Optical Sensor, Gesture Drive bridge</em>)
-                along with connected cloud-project windows (<em>Caught In 4K Hugging Face Space &amp; Nothing as a Service™</em>), 
-                retro window management engines, procedural ragebait schedulers, simulated filesystems, and Web Audio synthesizers 
+                (<em>File Manager, MS-DOS Prompt, Setup Wizard, System Monitor, Optical Sensor, Gesture Drive bridge, Paint, Notepad, Calculator, Calendar, and RAGEWARE Mail</em>)
+                along with connected cloud-project windows (<em>NOBROWSE™ AI Web Browser, Caught In 4K Vercel Vision App &amp; Nothing as a Service™</em>), 
+                retro window management engines, procedural ragebait schedulers, simulated filesystems with authentic 90s/2000s media, and Web Audio synthesizers 
                 inside RAGEWARE OS are <strong>purely engineered from scratch by Team AltF4</strong>.
               </p>
               <p className="disclaimer-sub">
@@ -127,7 +132,7 @@ export default function Landing({ onLaunchOS }) {
             </span>
           </div>
 
-          {/* Live Telemetry / Diagnostics Cockpit Row */}
+          {/* Live Telemetry / Diagnostics Cockpit Row (6 Cards) */}
           <div className="landing-status-cards-row">
             <div className="landing-status-card">
               <div className="status-card-header mono">
@@ -135,16 +140,34 @@ export default function Landing({ onLaunchOS }) {
                 SYSTEM COMPOSITOR
               </div>
               <div className="status-card-val mono">READY</div>
-              <div className="status-card-desc">Virtual Win95 sandbox &amp; retro IE5 browser windows.</div>
+              <div className="status-card-desc">Virtual Win95/98 sandbox, 3D windows &amp; active taskbar.</div>
             </div>
 
             <div className="landing-status-card">
               <div className="status-card-header mono">
                 <span className="status-indicator ready" />
-                CLOUD &amp; EMBEDDED SPACES
+                CLOUD &amp; EMBEDDED APPS
               </div>
               <div className="status-card-val mono">ONLINE</div>
-              <div className="status-card-desc">Caught In 4K (Modal App) &amp; NaaS Web Window online.</div>
+              <div className="status-card-desc">NOBROWSE™, Caught In 4K &amp; NaaS Web Windows online.</div>
+            </div>
+
+            <div className="landing-status-card">
+              <div className="status-card-header mono">
+                <span className="status-indicator ready" />
+                MEDIA ARCHIVE
+              </div>
+              <div className="status-card-val mono">LOADED</div>
+              <div className="status-card-desc">Authentic 90s/2000s Pictures &amp; 80s/90s Synth audio vault.</div>
+            </div>
+
+            <div className="landing-status-card">
+              <div className="status-card-header mono">
+                <span className="status-indicator ready" />
+                COMMUNICATION
+              </div>
+              <div className="status-card-val mono">SYNCED</div>
+              <div className="status-card-desc">RAGEWARE Mail real-time P2P client &amp; session manager.</div>
             </div>
 
             <div className="landing-status-card">
@@ -162,50 +185,90 @@ export default function Landing({ onLaunchOS }) {
                 CIRCUIT BREAKER
               </div>
               <div className="status-card-val mono">F8 ARMED</div>
-              <div className="status-card-desc">Instant Safe Shield override toggle ready.</div>
+              <div className="status-card-desc">Instant Safe Shield override toggle ready anytime.</div>
             </div>
           </div>
 
-          {/* High-Density 8-Card Architecture Matrix */}
+          {/* High-Density Architecture Matrix (11 Cards) */}
           <div className="landing-features-section">
             <div className="features-section-title mono">
               <span>&#9632;</span> SYSTEM MODULE ARCHITECTURE &amp; CAPABILITIES (BY TEAM AltF4)
             </div>
 
             <div className="landing-features-grid">
+              {/* NOBROWSE */}
+              <div className="feature-grid-card">
+                <div className="feature-card-top">
+                  <span className="feature-card-icon"><IconBrowser size={20} /></span>
+                  <span className="feature-card-title mono">NOBROWSE™ (AI Web Browser)</span>
+                </div>
+                <p className="feature-card-desc">
+                  The browser that sometimes understands you (40% useful, 60% questionable). Embedded inside an authentic retro chrome-less window with instant sandbox connection to live cloud infrastructure.
+                </p>
+                <div className="feature-card-tag mono">Vercel Cloud &bull; nobrowser.vercel.app</div>
+              </div>
+
+              {/* Caught In 4K */}
+              <div className="feature-grid-card">
+                <div className="feature-card-top">
+                  <span className="feature-card-icon"><IconCaughtIn4K size={20} /></span>
+                  <span className="feature-card-title mono">Caught In 4K (AI Vision App)</span>
+                </div>
+                <p className="feature-card-desc">
+                  Live embedded AI computer vision surveillance application running inside a clean retro window with camera access, real-time emotion telemetry, and facial reaction surveillance.
+                </p>
+                <div className="feature-card-tag mono">Vercel Cloud &bull; caught-in-4k-rho.vercel.app</div>
+              </div>
+
+              {/* 90s/2000s Media Gallery */}
+              <div className="feature-grid-card">
+                <div className="feature-card-top">
+                  <span className="feature-card-icon"><IconFolder size={20} /></span>
+                  <span className="feature-card-title mono">Authentic 90s/2000s Media Vault</span>
+                </div>
+                <p className="feature-card-desc">
+                  Curated vintage computing photo archives (IBM PC 5150 with CRT DOS, 8"/5.25"/3.5" floppy diskettes, 1989 Nintendo Game Boy, 1995 Sony PlayStation 1) plus full 80s/90s Synthwave, Eurobeat, and Pop audio playback.
+                </p>
+                <div className="feature-card-tag mono">virtualFs.js &bull; Genuine Retro Media</div>
+              </div>
+
+              {/* RAGEWARE Mail */}
+              <div className="feature-grid-card">
+                <div className="feature-card-top">
+                  <span className="feature-card-icon"><IconMail size={20} /></span>
+                  <span className="feature-card-title mono">RAGEWARE Mail (P2P Client)</span>
+                </div>
+                <p className="feature-card-desc">
+                  Authentic Windows 95/Outlook Express style client-side email client with temporary IDs, session rooms, interactive composer dialog, troll emails, and persistent browser storage.
+                </p>
+                <div className="feature-card-tag mono">RagewareMailApp.jsx &bull; Real-Time Client</div>
+              </div>
+
+              {/* Adaptive Rage Engine */}
               <div className="feature-grid-card">
                 <div className="feature-card-top">
                   <span className="feature-card-icon"><IconRage size={20} /></span>
                   <span className="feature-card-title mono">Adaptive Rage Engine</span>
                 </div>
                 <p className="feature-card-desc">
-                  Dynamically calculates emotional friction (0 to 100) across 8 behavioral vectors. Uses weighted selection to discover and exploit user patience weaknesses.
+                  Dynamically calculates emotional friction (0 to 100) across 8 behavioral vectors. Uses weighted selection to discover and exploit user patience weaknesses with escalating interface hostility.
                 </p>
                 <div className="feature-card-tag mono">rageEngine.js &bull; Pure JS Store</div>
               </div>
 
+              {/* Win95/98 Compositor */}
               <div className="feature-grid-card">
                 <div className="feature-card-top">
-                  <span className="feature-card-icon"><IconFolder size={20} /></span>
+                  <span className="feature-card-icon"><IconCpu size={20} /></span>
                   <span className="feature-card-title mono">Win95/98 Compositor</span>
                 </div>
                 <p className="feature-card-desc">
-                  Hand-crafted retro desktop complete with movable/resizable 3D windows, z-index hierarchy, active taskbar process management, and cascading Start Menu.
+                  Hand-crafted retro desktop complete with movable/resizable 3D windows, z-index hierarchy, active taskbar process management, and cascading Start Menu with hover-dodging icons.
                 </p>
                 <div className="feature-card-tag mono">Desktop.jsx &bull; Custom Window Manager</div>
               </div>
 
-              <div className="feature-grid-card">
-                <div className="feature-card-top">
-                  <span className="feature-card-icon"><IconCaughtIn4K size={20} /></span>
-                  <span className="feature-card-title mono">Caught In 4K (Modal AI App)</span>
-                </div>
-                <p className="feature-card-desc">
-                  Live embedded AI computer vision surveillance application running inside an authentic retro IE5 browser window with address bar, refresh, and camera access.
-                </p>
-                <div className="feature-card-tag mono">Modal Cloud &bull; mohamed-arif-j/caught-in-4k</div>
-              </div>
-
+              {/* Nothing as a Service */}
               <div className="feature-grid-card">
                 <div className="feature-card-top">
                   <span className="feature-card-icon"><IconNaaS size={20} /></span>
@@ -217,42 +280,46 @@ export default function Landing({ onLaunchOS }) {
                 <div className="feature-card-tag mono">IE5 Web Window &bull; Nothing-as-a-Service</div>
               </div>
 
+              {/* Local Optical Vision */}
               <div className="feature-grid-card">
                 <div className="feature-card-top">
                   <span className="feature-card-icon"><IconCamera size={20} /></span>
                   <span className="feature-card-title mono">Local Optical Vision</span>
                 </div>
                 <p className="feature-card-desc">
-                  Local MediaPipe face landmark detection running 100% in-browser. Monitors head movement and facial activity during post-failure reaction windows. Strictly audio-free.
+                  Local MediaPipe face landmark detection running 100% in-browser via WebAssembly. Monitors head movement and facial activity during post-failure reaction windows. Strictly audio-free.
                 </p>
                 <div className="feature-card-tag mono">MediaPipe WASM &bull; Zero Cloud Telemetry</div>
               </div>
 
+              {/* Web Audio Synthesizer */}
               <div className="feature-grid-card">
                 <div className="feature-card-top">
-                  <span className="feature-card-icon"><IconCpu size={20} /></span>
+                  <span className="feature-card-icon"><IconActivity size={20} /></span>
                   <span className="feature-card-title mono">Web Audio Synthesizer</span>
                 </div>
                 <p className="feature-card-desc">
-                  Zero external audio files. Generates polyphonic Brian Eno E-flat major 9th startup chords, authentic 80ms window blips, critical stops, and virus storms procedurally.
+                  Zero external audio files. Generates polyphonic Brian Eno E-flat major 9th startup chords, melancholic descending shutdown arpeggios, motor spin-downs, and virus storms procedurally.
                 </p>
                 <div className="feature-card-tag mono">Web Audio API &bull; Multi-Oscillator Synth</div>
               </div>
 
+              {/* Native OS Productivity Suite */}
               <div className="feature-grid-card">
                 <div className="feature-card-top">
                   <span className="feature-card-icon"><IconTerminal size={20} /></span>
                   <span className="feature-card-title mono">Native OS Application Suite</span>
                 </div>
                 <p className="feature-card-desc">
-                  Built-in Explorer file manager with hover evasion, MS-DOS Prompt with exit traps, 99% stalled setup installer, and real-time CRT oscilloscope System Monitor.
+                  Built-in Explorer file manager with hover evasion, MS-DOS Prompt with exit traps, Paint canvas toolset, Notepad with troll proofreading, 16-bit Calculator, Calendar, and Recycle Bin.
                 </p>
-                <div className="feature-card-tag mono">10 Desktop Apps &bull; Built From Scratch</div>
+                <div className="feature-card-tag mono">12 Desktop Apps &bull; Built From Scratch</div>
               </div>
 
+              {/* Gesture Drive Bridge */}
               <div className="feature-grid-card">
                 <div className="feature-card-top">
-                  <span className="feature-card-icon"><IconActivity size={20} /></span>
+                  <span className="feature-card-icon"><IconGestureDrive size={20} /></span>
                   <span className="feature-card-title mono">Gesture Drive Protocol Bridge</span>
                 </div>
                 <p className="feature-card-desc">
@@ -272,7 +339,7 @@ export default function Landing({ onLaunchOS }) {
             <span>DEVELOPED &amp; CRAFTED FROM SCRATCH BY TEAM <strong>AltF4</strong></span>
           </div>
           <div className="footer-right">
-            <span>ZERO EXTERNAL APIS // NO CLOUD TELEMETRY</span>
+            <span>ZERO EXTERNAL TRACKERS // 100% LOCAL PROCESSING</span>
           </div>
         </footer>
       </div>
@@ -319,13 +386,16 @@ export default function Landing({ onLaunchOS }) {
                   <strong> please explore each application and option thoroughly without skipping</strong>!
                 </p>
                 <ul className="dialog-explore-list mono">
-                  <li>📁 <strong>File Manager</strong>: Explore folders &amp; observe evasion friction</li>
+                  <li>🌐 <strong>NOBROWSE™</strong>: The browser that sometimes understands you (nobrowser.vercel.app)</li>
+                  <li>📹 <strong>Caught In 4K</strong>: Live AI surveillance camera application (caught-in-4k-rho.vercel.app)</li>
+                  <li>📁 <strong>File Manager &amp; Pictures</strong>: Real 90s/2000s vintage hardware photos (IBM PC, Floppy Disks, Game Boy, PS1) &amp; 80s music</li>
+                  <li>✉️ <strong>RAGEWARE Mail</strong>: Real-time retro communication client with temporary session rooms</li>
                   <li>💻 <strong>MS-DOS Prompt</strong>: Run diagnostic commands &amp; test the exit trap</li>
+                  <li>🎨 <strong>Paint &amp; Notepad</strong>: Retro canvas toolset and AI proofreading with troll suggestions</li>
                   <li>⏳ <strong>Setup Wizard</strong>: Experience the infamous 99% progress stall</li>
                   <li>📈 <strong>System Monitor</strong>: Observe real-time CRT graphs &amp; rage metrics</li>
                   <li>👁️ <strong>Optical Sensor</strong>: Local MediaPipe real-time face telemetry</li>
-                  <li>📹 <strong>Caught In 4K</strong>: Live AI surveillance camera application (mohamed-arif-j--caught-in-4k-caughtin4kserver-serve.modal.run)</li>
-                  <li>🌐 <strong>Nothing as a Service™</strong>: Embedded retro IE5 browser portal delivering pure Nothing</li>
+                  <li>☁️ <strong>Nothing as a Service™</strong>: Embedded retro browser portal delivering pure Nothing</li>
                   <li>🚗 <strong>Gesture Drive</strong>: Check native Windows protocol integration</li>
                 </ul>
               </div>

@@ -14,10 +14,15 @@
  * - Mechanical Tactile UI Click
  */
 
+let soundEngineInstance = null;
+
 class SoundEngine {
   constructor() {
+    soundEngineInstance = this;
     this.ctx = null;
     this.isMuted = false;
+    this.volume = 0.85;
+    this.masterGain = null;
     this.hasUnlocked = false;
     this.activeMelodyNodes = [];
     this.activeGainNodes = [];
@@ -29,6 +34,26 @@ class SoundEngine {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime);
+        // Connect directly using AudioNode prototype
+        AudioNode.prototype.connect.call(this.masterGain, this.ctx.destination);
+
+        // Global master routing: automatically route destination connections through masterGain
+        if (!AudioNode.prototype._rageMasterHooked) {
+          const originalConnect = AudioNode.prototype.connect;
+          AudioNode.prototype.connect = function(target, output, input) {
+            if (
+              soundEngineInstance && 
+              soundEngineInstance.masterGain && 
+              target === soundEngineInstance.ctx?.destination
+            ) {
+              return originalConnect.call(this, soundEngineInstance.masterGain, output, input);
+            }
+            return originalConnect.call(this, target, output, input);
+          };
+          AudioNode.prototype._rageMasterHooked = true;
+        }
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
@@ -39,12 +64,57 @@ class SoundEngine {
   }
 
   toggleMute() {
-    this.isMuted = !this.isMuted;
+    this.setMuted(!this.isMuted);
     return this.isMuted;
   }
 
   setMuted(muted) {
-    this.isMuted = muted;
+    this.isMuted = Boolean(muted);
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime);
+    }
+  }
+
+  getMuted() {
+    return this.isMuted;
+  }
+
+  setVolume(vol) {
+    this.volume = Math.max(0, Math.min(1, vol));
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime);
+    }
+  }
+
+  getVolume() {
+    return this.volume;
+  }
+
+  playSound(name) {
+    switch (name) {
+      case 'startup': return this.playStartup();
+      case 'shutdown': return this.playShutdown();
+      case 'spindown': return this.playDiskSpinDown();
+      case 'stop': return this.playCriticalStop();
+      case 'chord': return this.playChord();
+      case 'ding': return this.playDing();
+      case 'exclamation': return this.playExclamation();
+      case 'pcspeaker': return this.playPCSpeaker();
+      case 'boing': return this.playBoing();
+      case 'virus': return this.playVirusStorm();
+      case 'click': return this.playClick();
+      case 'tada': return this.playTada();
+      case 'shutter': return this.playCameraShutter();
+      case 'open': return this.playWindowOpen();
+      case 'close': return this.playWindowClose();
+      case 'minimize': return this.playWindowMinimize();
+      case 'recycle': return this.playRecycleEmpty();
+      case 'laser': return this.playLaserScanner();
+      case 'dialup': return this.playDialupModem();
+      case 'hardware': return this.playHardwareConnect();
+      case 'battery': return this.playBatteryAlarm();
+      default: return this.playDing();
+    }
   }
 
   // Helper to ensure context is ready
@@ -126,6 +196,190 @@ class SoundEngine {
       osc.start(startTime);
       osc.stop(startTime + dur + 0.05);
     });
+  }
+
+  /**
+   * 1B. Windows 95 Shutdown Chime (Melancholic descending arpeggio)
+   * Authentic descending tones: Bb5 -> G5 -> Eb5 -> C5 -> Bb4 -> G4 -> Eb4
+   * Accompanied by warm analog sub-bass and a gentle mechanical relay click.
+   */
+  playShutdown() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // Descending warm sine arpeggio
+    const descNotes = [
+      { f: 932.33, delay: 0.00, dur: 0.8, gain: 0.12 }, // Bb5
+      { f: 783.99, delay: 0.28, dur: 0.8, gain: 0.12 }, // G5
+      { f: 622.25, delay: 0.56, dur: 0.9, gain: 0.13 }, // Eb5
+      { f: 523.25, delay: 0.84, dur: 0.9, gain: 0.13 }, // C5
+      { f: 466.16, delay: 1.12, dur: 1.0, gain: 0.14 }, // Bb4
+      { f: 392.00, delay: 1.40, dur: 1.2, gain: 0.13 }, // G4
+      { f: 311.13, delay: 1.68, dur: 1.6, gain: 0.14 }, // Eb4 (resolving root)
+    ];
+
+    descNotes.forEach(({ f, delay, dur, gain: noteGain }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, now + delay);
+
+      const startTime = now + delay;
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(noteGain, startTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + dur);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + dur + 0.05);
+    });
+
+    // Deep warm foundation sub-bass swell
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = 'triangle';
+    subOsc.frequency.setValueAtTime(77.78, now); // Eb2
+    subGain.gain.setValueAtTime(0.001, now);
+    subGain.gain.linearRampToValueAtTime(0.12, now + 0.6);
+    subGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.0);
+    subOsc.connect(subGain);
+    subGain.connect(ctx.destination);
+    subOsc.start(now);
+    subOsc.stop(now + 3.1);
+
+    // Hard drive head park click at end
+    setTimeout(() => {
+      if (this.ctx && !this.isMuted) {
+        this.playKeyClick();
+      }
+    }, 2400);
+  }
+
+  /**
+   * 1C. Vintage Hard Disk / Floppy Motor Spin-down
+   * Simulates high-frequency motor inertia decaying into silent standstill.
+   */
+  playDiskSpinDown() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    // Spin down frequency sweep from 1800Hz to 60Hz
+    osc.frequency.setValueAtTime(1800, now);
+    osc.frequency.exponentialRampToValueAtTime(60, now + 1.8);
+
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.9);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 2.0);
+  }
+
+  /**
+   * 1D. CRT Degauss Coil & Flyback Ignition ("THWUMMMMP-bzzzz")
+   * Simulates high-voltage electromagnetic degaussing coil on retro monitors.
+   */
+  playCrtDegauss() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // Heavy low frequency magnetic coil thump
+    const coilOsc = ctx.createOscillator();
+    const coilGain = ctx.createGain();
+    coilOsc.type = 'sawtooth';
+    coilOsc.frequency.setValueAtTime(140, now);
+    coilOsc.frequency.exponentialRampToValueAtTime(45, now + 0.8);
+
+    coilGain.gain.setValueAtTime(0.25, now);
+    coilGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+    coilOsc.connect(coilGain);
+    coilGain.connect(ctx.destination);
+    coilOsc.start(now);
+    coilOsc.stop(now + 1.3);
+
+    // 15.75 kHz ultrasonic flyback transformer ping
+    const flybackOsc = ctx.createOscillator();
+    const flybackGain = ctx.createGain();
+    flybackOsc.type = 'sine';
+    flybackOsc.frequency.setValueAtTime(8000, now);
+    flybackOsc.frequency.linearRampToValueAtTime(14000, now + 0.3);
+
+    flybackGain.gain.setValueAtTime(0.0001, now);
+    flybackGain.gain.linearRampToValueAtTime(0.04, now + 0.05);
+    flybackGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+
+    flybackOsc.connect(flybackGain);
+    flybackGain.connect(ctx.destination);
+    flybackOsc.start(now);
+    flybackOsc.stop(now + 1.0);
+  }
+
+  /**
+   * 1E. CRT Beam Collapse & Cathode Discharge ("Pop / Whine / Silence")
+   * Simulates CRT television power-down beam collapse into dot and fade.
+   */
+  playCrtOff() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // Mechanical power switch tactile click
+    this.playKeyClick();
+
+    // High frequency flyback decay whine
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(12000, now);
+    osc.frequency.exponentialRampToValueAtTime(200, now + 0.45);
+
+    gain.gain.setValueAtTime(0.10, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.55);
+  }
+
+  /**
+   * 1F. BIOS POST Memory Tick
+   * Fast mechanical motherboard tick sound during RAM checking.
+   */
+  playMemoryTick() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1200, now);
+
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.02);
   }
 
   /**
@@ -708,6 +962,101 @@ class SoundEngine {
 
     subOsc.start(now + 0.8);
     subOsc.stop(now + 2.9);
+  }
+
+  /**
+   * 15. Windows Hardware Disconnect Sound
+   * Classic descending two-tone chime (High tone -> Low tone) for device unplug.
+   */
+  playHardwareDisconnect() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // High tone (E5 ~659 Hz)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'triangle';
+    osc1.frequency.setValueAtTime(659.25, now);
+    gain1.gain.setValueAtTime(0.24, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.13);
+
+    // Low tone (C5 ~523 Hz or G4 ~392 Hz)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(392.00, now + 0.11);
+    gain2.gain.setValueAtTime(0.001, now);
+    gain2.gain.setValueAtTime(0.24, now + 0.11);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.11);
+    osc2.stop(now + 0.34);
+  }
+
+  /**
+   * 16. Windows Hardware Connect Sound
+   * Ascending two-tone chime (Low tone -> High tone) for device plug.
+   */
+  playHardwareConnect() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // Low tone (G4 ~392 Hz)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'triangle';
+    osc1.frequency.setValueAtTime(392.00, now);
+    gain1.gain.setValueAtTime(0.22, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.12);
+
+    // High tone (E5 ~659 Hz)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(659.25, now + 0.10);
+    gain2.gain.setValueAtTime(0.001, now);
+    gain2.gain.setValueAtTime(0.25, now + 0.10);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.10);
+    osc2.stop(now + 0.34);
+  }
+
+  /**
+   * 17. Battery Alarm Urgent Beep
+   * Motherboard urgent beep pulse for battery countdown.
+   */
+  playBatteryAlarm() {
+    const ctx = this.getReadyContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    [0, 0.12].forEach((offset) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(950, now + offset);
+      gain.gain.setValueAtTime(0.18, now + offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.09);
+    });
   }
 }
 

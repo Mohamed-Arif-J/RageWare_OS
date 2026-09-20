@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { soundEngine } from '../../engine/soundEngine';
 
-const CAUGHT_IN_4K_URL = 'https://caught-in-4k-rho.vercel.app/';
+const NOBROWSER_URL = 'https://nobrowser.vercel.app/';
 
-export default function CaughtIn4KApp() {
+export default function NoBrowserApp() {
   const iframeRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -23,24 +23,24 @@ export default function CaughtIn4KApp() {
     setIsLoading(true);
     setLoadError(false);
     if (iframeRef.current) {
-      iframeRef.current.src = CAUGHT_IN_4K_URL + (CAUGHT_IN_4K_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+      const cacheBust = (NOBROWSER_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+      iframeRef.current.src = NOBROWSER_URL + cacheBust;
     }
   };
 
   const handleOpenExternal = () => {
     soundEngine.playClick();
-    window.open(CAUGHT_IN_4K_URL, '_blank', 'noopener,noreferrer');
+    window.open(NOBROWSER_URL, '_blank', 'noopener,noreferrer');
   };
 
   return (
-    <div className="naas-browser-shell" id="app-caught-in-4k">
-
+    <div className="naas-browser-shell" id="app-nobrowser">
       {/* Loading progress bar */}
       {isLoading && (
         <div className="naas-loading-bar">
           <div className="naas-loading-progress" />
           <span className="mono naas-loading-text">
-            Connecting to Caught In 4K (Modal Cloud App)...
+            Connecting to NOBROWSE™ (nobrowser.vercel.app)...
           </span>
         </div>
       )}
@@ -49,11 +49,11 @@ export default function CaughtIn4KApp() {
       <div className="naas-viewport">
         {loadError ? (
           <div className="naas-error-screen">
-            <div className="naas-error-icon">📹</div>
-            <div className="naas-error-title mono">Caught In 4K — Surveillance App</div>
+            <div className="naas-error-icon">🌐</div>
+            <div className="naas-error-title mono">NOBROWSE™ — Connection Offline</div>
             <div className="naas-error-msg mono">
-              The server at <strong>caught-in-4k-rho.vercel.app</strong> could not be loaded inside the container, or the connection timed out.<br /><br />
-              Please retry or open the application directly in your browser.
+              The server at <strong>nobrowser.vercel.app</strong> could not be loaded inside the sandbox container.<br /><br />
+              NOBROWSE™ might be questioning your life choices (40% useful, 60% questionable).
             </div>
             <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
               <button className="win95-btn naas-retry-btn" onClick={handleReload}>
@@ -67,8 +67,8 @@ export default function CaughtIn4KApp() {
         ) : (
           <iframe
             ref={iframeRef}
-            src={CAUGHT_IN_4K_URL}
-            title="Caught In 4K — AI Surveillance App"
+            src={NOBROWSER_URL}
+            title="NOBROWSE™ - The browser that sometimes understands you"
             className="naas-iframe"
             onLoad={handleLoad}
             onError={handleError}
@@ -81,10 +81,10 @@ export default function CaughtIn4KApp() {
       {/* Retro status bar */}
       <div className="naas-status-bar mono">
         <span className="naas-status-left">
-          {isLoading ? '⌛ Loading...' : loadError ? '✖ Standby' : '✔ Done'}
+          {isLoading ? '⌛ Loading...' : loadError ? '✖ Offline' : '✔ Done'}
         </span>
         <span className="naas-status-center">
-          Caught In 4K — caught-in-4k-rho.vercel.app
+          NOBROWSE™ — The browser that sometimes understands you.
         </span>
         <span className="naas-status-right">🌐 Internet Zone</span>
       </div>

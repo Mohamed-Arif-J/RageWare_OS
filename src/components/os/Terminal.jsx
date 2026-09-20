@@ -202,10 +202,58 @@ Breakdown:
     ]);
   };
 
+  const TERMINAL_AUTOCORRECT = {
+    dir: 'die',
+    help: 'suffer',
+    exit: 'stay',
+    quit: 'never',
+    cls: 'chaos',
+    clear: 'clutter',
+    status: 'stressed',
+    apps: 'traps',
+    ver: 'obsolete',
+    whoami: 'nobody',
+    date: 'doomsday',
+    reboot: 'refuse',
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleCommand(inputVal);
       setInputVal('');
+      return;
+    }
+
+    if (!isChaosMode) return;
+
+    // Chaos Mode Keystroke Corruption
+    if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      // 1. Key Sticking / Spamming: ~15% chance to duplicate keypress 2-3 times
+      if (Math.random() < 0.15) {
+        e.preventDefault();
+        const repeatCount = Math.floor(Math.random() * 2) + 2; // 2 or 3 chars
+        const spammed = e.key.repeat(repeatCount);
+        setInputVal((prev) => prev + spammed);
+        soundEngine.playKeyboardClick?.() || soundEngine.playClick();
+        return;
+      }
+
+      // 2. Purposeful Autocorrect on Space
+      if (e.key === ' ') {
+        const words = inputVal.trim().split(/\s+/);
+        if (words.length > 0) {
+          const lastWord = words[words.length - 1].toLowerCase();
+          if (TERMINAL_AUTOCORRECT[lastWord] && Math.random() < 0.75) {
+            e.preventDefault();
+            const replaced = TERMINAL_AUTOCORRECT[lastWord];
+            const lastIndex = inputVal.lastIndexOf(words[words.length - 1]);
+            const updated = inputVal.substring(0, lastIndex) + replaced + ' ';
+            setInputVal(updated);
+            soundEngine.playDing();
+            return;
+          }
+        }
+      }
     }
   };
 

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { increaseRage, recordSuccess, RAGE_EVENTS } from '../../engine/rageEngine';
 import { rageBaitEngineInstance, RAGEBAIT_EVENT_TYPES } from '../../engine/rageBaitEngine';
 import { soundEngine } from '../../engine/soundEngine';
+import { systemSettings } from '../../services/systemSettings';
 
 export default function OSWindow({
   id,
@@ -19,6 +20,7 @@ export default function OSWindow({
   rageLevel = 0,
   isChaosMode = true,
   showMenuBar = true,
+  showStatusBar = true,
   statusBarText = 'Ready',
   onFocus,
   onClose,
@@ -31,6 +33,17 @@ export default function OSWindow({
   const [isMaximized, setIsMaximized] = useState(false);
   const [prevBounds, setPrevBounds] = useState({ x: initialX, y: initialY, width: initialWidth, height: initialHeight });
   const [activeMenu, setActiveMenu] = useState(null);
+
+  // Settings: Show window contents while dragging
+  const [dragContents, setDragContents] = useState(() => systemSettings.get('dragContents') ?? true);
+  const [dragOutline, setDragOutline] = useState(null);
+  const dragOutlineRef = useRef(null);
+
+  useEffect(() => {
+    return systemSettings.subscribe((settings) => {
+      setDragContents(settings.dragContents ?? true);
+    });
+  }, []);
 
   // Hostile Window Controls State
   const [closeBtnOffset, setCloseBtnOffset] = useState({ x: 0, y: 0 });
@@ -77,13 +90,23 @@ export default function OSWindow({
       const clampedX = Math.max(leftLimit, Math.min(rightLimit, newX));
       const clampedY = Math.max(topLimit, Math.min(bottomLimit, newY));
 
-      setPosition({ x: clampedX, y: clampedY });
+      if (dragContents) {
+        setPosition({ x: clampedX, y: clampedY });
+      } else {
+        setDragOutline({ x: clampedX, y: clampedY });
+        dragOutlineRef.current = { x: clampedX, y: clampedY };
+      }
     };
 
     const handleMouseUp = () => {
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         document.body.classList.remove('os-dragging-active');
+        if (!dragContents && dragOutlineRef.current) {
+          setPosition({ x: dragOutlineRef.current.x, y: dragOutlineRef.current.y });
+          setDragOutline(null);
+          dragOutlineRef.current = null;
+        }
       }
     };
 
@@ -189,20 +212,35 @@ export default function OSWindow({
   };
 
   return (
-    <div
-      ref={windowRef}
-      id={`os-window-${id}`}
-      className={`win95-window win-open ${isActive ? 'active-window' : 'inactive-window'} ${isMaximized ? 'maximized' : ''} ${isMinimized ? 'minimized-window' : ''} ${rageLevel > 70 ? 'rage-pulse-active' : ''}`}
-      style={{
-        display: isMinimized ? 'none' : 'flex',
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: isMaximized ? '100vw' : `${size.width}px`,
-        height: isMaximized ? 'calc(100vh - 32px)' : `${size.height}px`,
-        zIndex,
-      }}
-      onMouseDown={handleWindowMouseDown}
-    >
+    <>
+      {dragOutline && (
+        <div 
+          className="win95-window-drag-outline"
+          style={{
+            position: 'fixed',
+            left: `${dragOutline.x}px`,
+            top: `${dragOutline.y}px`,
+            width: isMaximized ? '100vw' : `${size.width}px`,
+            height: isMaximized ? 'calc(100vh - 32px)' : `${size.height}px`,
+            zIndex: zIndex + 25,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      <div
+        ref={windowRef}
+        id={`os-window-${id}`}
+        className={`win95-window win-open ${isActive ? 'active-window' : 'inactive-window'} ${isMaximized ? 'maximized' : ''} ${isMinimized ? 'minimized-window' : ''} ${rageLevel > 70 ? 'rage-pulse-active' : ''}`}
+        style={{
+          display: isMinimized ? 'none' : 'flex',
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          width: isMaximized ? '100vw' : `${size.width}px`,
+          height: isMaximized ? 'calc(100vh - 32px)' : `${size.height}px`,
+          zIndex,
+        }}
+        onMouseDown={handleWindowMouseDown}
+      >
       {/* Classic Title Bar */}
       <div 
         className={`win95-titlebar ${rageLevel > 70 && isActive ? 'titlebar-pulse' : ''}`}
@@ -335,11 +373,14 @@ export default function OSWindow({
       </div>
 
       {/* Classic Status Bar */}
-      <div className="win95-statusbar">
-        <div className="statusbar-segment status-main">{statusBarText}</div>
-        <div className="statusbar-segment status-sec">CAPS</div>
-        <div className="statusbar-segment status-sec">NUM</div>
-      </div>
+      {showStatusBar && (
+        <div className="win95-statusbar">
+          <div className="statusbar-segment status-main">{statusBarText}</div>
+          <div className="statusbar-segment status-sec">CAPS</div>
+          <div className="statusbar-segment status-sec">NUM</div>
+        </div>
+      )}
     </div>
+    </>
   );
 }

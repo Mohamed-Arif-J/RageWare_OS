@@ -15,7 +15,7 @@
 
 ### Project Description
 **RAGEWARE** is an interactive, browser-based simulation of a retro 1990s desktop operating system (styled after Windows 95 and Windows 98). Rather than presenting separate, disjointed mini-games, **the operating system itself serves as the interactive environment**. As the user performs common computing tasks—such as browsing files, typing commands, running system updates, or adjusting settings—the system actively monitors user behavior and becomes progressively uncooperative, sarcastic, and hostile. 
-The application observes behavioral indicators (such as rapid clicking, repeated failed button clicks, attempts to close warning dialogs, and post-failure facial activity via an optional webcam sensor). It feeds these signals into a dynamic **Rage Engine**, which adapts interface friction to exploit the user's specific behavioral vulnerabilities.We added more useless applications like caughtin 4K, NAAS, Drive by gesture.
+The application observes behavioral indicators (such as rapid clicking, repeated failed button clicks, attempts to close warning dialogs, and post-failure facial activity via an optional webcam sensor). It feeds these signals into a dynamic **Rage Engine**, which adapts interface friction to exploit the user's specific behavioral vulnerabilities. We added more useless applications like Caught In 4K, NOBROWSE™, NAAS, and Gesture Drive.
 
 ### The Problem (that doesn't exist)
 Modern software engineering and HCI tries to make interfaces smooth, simple, and user-friendly.
@@ -109,7 +109,10 @@ GitHub
 npm
 Nodemon
 
-Caught in 4K[live webapp Application in RageWare OS]
+Caught in 4K [Live Web App Application in RageWare OS]
+- **Live URL**: https://caught-in-4k-rho.vercel.app/
+- **Description**: Real-time AI computer vision surveillance application running embedded inside an authentic retro window. Tracks facial reactions and emotion telemetry.
+
 [Languages used]
 Python (3.10+)
 JavaScript (ES6+)
@@ -147,11 +150,37 @@ axios
 Vite
 @vitejs/plugin-react
 Modal (Serverless GPU Cloud Runtime)
+Vercel Cloud
 Git
 GitHub
 MediaDevices / getUserMedia API (Webcam optical frame buffer)
 Canvas / Blob URL Object APIs
 Windows 95/98 Design System (Authentic Retro OS styling)
+
+
+NOBROWSE™ [Live Web App Application in RageWare OS]
+- **Live URL**: https://nobrowser.vercel.app/
+- **Description**: The distraction-free, unpredictable AI browser (40% useful, 60% questionable). Embedded directly inside an authentic retro chrome-less window.
+
+[Languages used]
+JavaScript (ES6+)
+HTML5
+CSS3
+
+[Frameworks & Tools used]
+Next.js / React
+Vercel Cloud Deployment
+Tailored Minimalist CSS Engine
+
+
+Authentic 90s/2000s Media Gallery & Sound Vault [Native File System Feature]
+- **Description**: Curated vintage hardware photography archive and 80s/90s Synthwave/Rock/Pop audio vault stored in the simulated in-memory filesystem (`virtualFs.js`).
+- **Media Archives**:
+  - *IBM PC 5150 Battlestation (1995)*: Vintage green CRT monitor with DOS prompt & mechanical keyboard.
+  - *Floppy Disk Collection*: Authentic 8-inch, 5.25-inch, and 3.5-inch magnetic storage diskettes.
+  - *Nintendo Game Boy (1989)*: Original Dot Matrix Game Boy console.
+  - *Sony PlayStation (1995)*: Classic 32-bit PS1 CD console.
+  - *Audio Tracks*: Rick Astley (1987), a-ha (1985), Harold Faltermeyer (1984), Nirvana (1991), Darude (1999), and Britney Spears (1998).
 
 
 Implementation
@@ -227,6 +256,65 @@ https://drive.google.com/file/d/1niHrqr2EnIt1GPrBrRRqXgPCinyKPLRD/view?usp=shari
 ## Team Contributions
 - [Mohamed Arif J]: [Builded The applications in the RagewareOS]
 - [Adhil V T]: [Builded RageWare OS]
+
+---
+
+### Temporary Real-Time RAGEWARE Mail
+
+RAGEWARE Mail is a simulated retro Windows 95/98 communication client allowing two users running RAGEWARE on different browsers or computers to exchange genuine, instant messages in real time.
+
+```mermaid
+flowchart LR
+
+A[Computer A<br/>RAGEWARE<br/>ADHIL95] <-->|WebSocket| S[Temporary RAGEWARE<br/>Communication Server]
+
+B[Computer B<br/>RAGEWARE<br/>ALEX95] <-->|WebSocket| S
+
+S --> M[(Temporary<br/>In-Memory State)]
+```
+
+#### Core Architecture & Features:
+- **Temporary RAGEWARE ID**: Users pick a temporary session ID (e.g. `ADHIL95`, `ALEX95`). No password, no permanent profile, no registration.
+- **Temporary Address**: Displayed as `ADHIL95@RAGEWARE` (simulated address within RAGEWARE, not a real public internet email).
+- **Temporary Session / Room**: Users enter a shared 5-character session room code (e.g. `7K4P9`). Duplicate IDs within the same active room are automatically rejected.
+- **Real-Time WebSocket Protocol**: Direct bidirectional peer delivery. When `ADHIL95` sends a message, `ALEX95` receives it immediately with zero page refresh.
+- **Pure In-Memory State**: Zero database (no PostgreSQL, SQLite, MongoDB, Supabase, or Firebase). All active connections, rooms, and temporary message logs exist strictly in RAM during the active session. When users leave or the server restarts, all data disappears.
+- **No Real Email**: Does not use or touch SMTP, IMAP, Gmail API, Outlook, SendGrid, or OAuth.
+- **Vercel Frontend Compatibility**: The RAGEWARE frontend stays hosted on Vercel as a static client, connecting to the communication server via the configurable `VITE_RAGEWARE_REALTIME_URL` environment variable.
+- **Retro Windows 95/98 Client**: Complete with classic folder navigation (`Inbox`, `Sent`, `Drafts`, `Trash`), reading pane, message composition dialog, reply threads (`Re: ...`), and online user presence.
+- **OS Integration**: Real-time incoming mail displays the classic Windows 95 system tray balloon notification with an `[ OPEN ]` button. Clicking `[ OPEN ]` launches RAGEWARE Mail and highlights the incoming message.
+- **Rage & Personality Synchronization**: Failed recipient lookups feed subtle friction into the `rageEngine`, while repeated refreshes, rapid send attempts, and delivery milestones trigger authentic `osPersonality` reactions.
+
+#### Local Development:
+
+**Terminal 1 — Start the Real-Time Communication Server:**
+```bash
+npm run server
+# Starts WebSocket server on ws://localhost:8000
+```
+
+**Terminal 2 — Start RAGEWARE Frontend:**
+```bash
+npm run dev
+# Starts Vite dev server on http://localhost:5173
+```
+
+#### Two-User Demonstration Flow:
+1. Open **Browser 1** (e.g., Chrome):
+   - Navigate to RAGEWARE OS -> Open **RAGEWARE Mail**.
+   - Enter ID: `ADHIL95`.
+   - Select **Create New Session** (note the 5-character code, e.g. `7K4P9`).
+   - Click **Enter RAGEWARE Mail**.
+2. Open **Browser 2** (e.g., Chrome Incognito or Edge):
+   - Navigate to RAGEWARE OS -> Open **RAGEWARE Mail**.
+   - Enter ID: `ALEX95`.
+   - Select **Join Existing Session** and enter `7K4P9`.
+   - Click **Enter RAGEWARE Mail**.
+3. **Send & Reply**:
+   - Both users will see each other in the `ONLINE USERS` list.
+   - `ADHIL95` clicks **New Msg**, enters `ALEX95@RAGEWARE`, Subject: `Lab Meeting`, Body: `Are you coming to the lab?`, and clicks **SEND**.
+   - `ALEX95` immediately receives a system tray notification (`NEW MAIL From: ADHIL95@RAGEWARE [ OPEN ]`) and the email lands in the Inbox.
+   - `ALEX95` clicks **Reply**, writes `Yes, I'll be there.`, and sends. `ADHIL95` receives the reply immediately.
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 

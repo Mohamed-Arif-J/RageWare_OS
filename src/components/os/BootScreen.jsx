@@ -33,37 +33,43 @@ function EnergyStarLogo() {
 }
 
 export default function BootScreen({ onBootComplete }) {
-  // Stages: 'bios' -> 'menu' -> 'step' -> 'specs' -> 'splash'
+  // Stages: 'bios' -> 'menu' -> 'dosload' -> 'step' -> 'specs' -> 'splash'
   const [stage, setStage] = useState('bios');
   const [selectedOption, setSelectedOption] = useState(1);
   const [countdown, setCountdown] = useState(7);
   const [memoryKB, setMemoryKB] = useState(16384);
   const [isMemoryDone, setIsMemoryDone] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [pendingBootMode, setPendingBootMode] = useState('normal');
 
   const profile = getRageProfile();
   const timerRef = useRef(null);
 
-  // Fast counting memory test on BIOS stage
+  // Fast counting memory test on BIOS stage with CRT degauss sound
   useEffect(() => {
     if (stage === 'bios') {
       soundEngine.init();
+      // Play high voltage CRT degauss coil surge at boot start!
+      soundEngine.playCrtDegauss();
+
       const memInterval = setInterval(() => {
         setMemoryKB((prev) => {
-          if (prev >= 65536) {
+          if (prev >= 131072) {
             clearInterval(memInterval);
             setIsMemoryDone(true);
             soundEngine.playBiosBeep(); // Classic Motherboard POST Beep!
-            return 65536;
+            return 131072;
           }
-          return prev + 8192;
+          // Motherboard RAM check tick sound
+          soundEngine.playMemoryTick();
+          return prev + 16384;
         });
-      }, 90);
+      }, 75);
 
-      // Auto-transition to Startup Menu after 2.4 seconds
+      // Auto-transition to Startup Menu after 2.8 seconds
       const biosTimeout = setTimeout(() => {
         setStage('menu');
-      }, 2400);
+      }, 2800);
 
       return () => {
         clearInterval(memInterval);
@@ -145,22 +151,30 @@ export default function BootScreen({ onBootComplete }) {
     soundEngine.playKeyClick();
 
     if (optionNum === 1) {
-      // Normal Mode
-      triggerSplashTransition('normal');
+      // Normal Mode -> Show MS-DOS driver stream -> splash
+      triggerDosLoadingStream('normal');
     } else if (optionNum === 2) {
-      // Safe Mode (Safe Shield Active)
-      triggerSplashTransition('safe');
+      // Safe Mode -> Show MS-DOS driver stream -> splash
+      triggerDosLoadingStream('safe');
     } else if (optionNum === 3) {
       // Step-by-Step Confirmation
       setStepIndex(0);
       setStage('step');
     } else if (optionNum === 4) {
       // Command Prompt Only (DOS)
-      triggerSplashTransition('dos');
+      triggerDosLoadingStream('dos');
     } else if (optionNum === 5) {
       // View System Specs
       setStage('specs');
     }
+  };
+
+  const triggerDosLoadingStream = (mode) => {
+    setPendingBootMode(mode);
+    setStage('dosload');
+    setTimeout(() => {
+      triggerSplashTransition(mode);
+    }, 1400);
   };
 
   const triggerSplashTransition = (mode) => {
@@ -168,7 +182,7 @@ export default function BootScreen({ onBootComplete }) {
     setTimeout(() => {
       soundEngine.playStartup();
       onBootComplete(mode);
-    }, 1600);
+    }, 1800);
   };
 
   const handleImmediateBoot = (mode = 'normal') => {
@@ -183,6 +197,9 @@ export default function BootScreen({ onBootComplete }) {
     'DEVICE=C:\\SYSTEM\\HIMEM.SYS [Y]',
     'DEVICE=C:\\SYSTEM\\TEAM_AltF4_RAGE_ENGINE.SYS [Y]',
     'DEVICE=C:\\SYSTEM\\OPTICAL_SENSOR_DRIVER.SYS [Y]',
+    'DEVICE=C:\\SYSTEM\\NOBROWSE_VIRTUAL_SOCK.SYS [Y]',
+    'DEVICE=C:\\SYSTEM\\CAUGHT_IN_4K_SURVEILLANCE.SYS [Y]',
+    'DEVICE=C:\\SYSTEM\\RAGEWARE_MAIL_P2P.SYS [Y]',
     'Process startup commands (AUTOEXEC.BAT)? [Y]',
     'WIN.COM /VER:4.10.1998 [Starting RAGEWARE GUI...]',
   ];
@@ -203,7 +220,7 @@ export default function BootScreen({ onBootComplete }) {
       case 2:
         return 'Safe Mode overrides all behavioral hostility. Safe Shield active (0% friction). Evasive buttons and disruptive popups disabled for evaluation.';
       case 3:
-        return 'Prompts user line-by-line before initializing each kernel subsystem (HIMEM.SYS, RAGE_CORE.SYS, SOUND_SYNTH.SYS, OPTICAL_VISION).';
+        return 'Prompts user line-by-line before initializing each kernel subsystem (HIMEM.SYS, RAGE_CORE.SYS, SOUND_SYNTH.SYS, OPTICAL_VISION, NOBROWSE, CAUGHT_4K).';
       case 4:
         return 'Boots directly into the MS-DOS 7.1 command interpreter shell with diagnostic utilities and exit traps.';
       case 5:
@@ -214,7 +231,7 @@ export default function BootScreen({ onBootComplete }) {
   };
 
   return (
-    <div className="os-boot-screen" id="os-boot-screen">
+    <div className="os-boot-screen crt-warmup-anim" id="os-boot-screen">
       {/* STAGE 1: Classic Award Modular BIOS POST Screen */}
       {stage === 'bios' && (
         <div className="bios-post-container mono">
@@ -231,32 +248,41 @@ export default function BootScreen({ onBootComplete }) {
 
           <div className="bios-specs-stream">
             <div className="bios-line">
-              Main Processor : <strong>Pentium(R) II CPU at 450MHz</strong> (Friction Multiplier: 100%)
+              Main Processor   : <strong>Pentium(R) II CPU at 450MHz</strong> (L2 Cache: 512KB, Friction Multiplier: 100%)
             </div>
             <div className="bios-line">
-              Memory Testing : <strong>{memoryKB}K</strong> {isMemoryDone ? 'OK' : '...'}
+              Memory Testing   : <strong>{memoryKB}K</strong> {isMemoryDone ? 'OK' : '...'}
             </div>
             <div className="bios-line">
-              Primary Master : WDC AC34300L (4300MB Ultra DMA/33)
+              Floppy Drive A   : 1.44MB 3.5-inch Drive (Ready)
             </div>
             <div className="bios-line">
-              Primary Slave  : ATAPI CD-ROM 32X MAX
+              Primary Master   : WDC AC34300L (4300MB Ultra DMA/33, Mode 4)
             </div>
             <div className="bios-line">
-              Optical Sensor : MediaPipe Face Mesh WASM Driver Initialized
+              Primary Slave    : ATAPI CD-ROM 32X MAX (Mode 4)
             </div>
             <div className="bios-line">
-              Sound Device   : Web Audio Synthetic SoundBlaster 16 Compatible
+              Secondary Master : NOBROWSE™ VIRTUAL SOCKET v1.0 (Live Cloud Bridge)
+            </div>
+            <div className="bios-line">
+              Secondary Slave  : CAUGHT_IN_4K OPTICAL FEED (WASM Active)
+            </div>
+            <div className="bios-line">
+              Sound Subsystem  : Web Audio Sound Blaster 16 AWE32 DSP v4.13
+            </div>
+            <div className="bios-line">
+              Display Subsystem: S3 Trio64V+ PCI 2MB VRAM (SVGA 800x600 60Hz)
             </div>
             {profile.rageScore >= 40 && (
               <div className="bios-line warning">
-                Advisory Cache : User Volatility Profile Loaded (Rage Index: {profile.rageScore}%)
+                Advisory Cache   : User Volatility Profile Loaded (Rage Index: {profile.rageScore}%)
               </div>
             )}
           </div>
 
           <div className="bios-footer-banner">
-            <span>Press <strong>F8</strong> to Enter Startup Menu &bull; <strong>DEL</strong> for Setup &bull; <strong>ESC</strong> to Skip</span>
+            <span>Press <strong>F8</strong> for Startup Menu &bull; <strong>DEL</strong> for Setup &bull; <strong>ESC</strong> for Quick Boot</span>
             <button className="bios-skip-btn" onClick={() => setStage('menu')}>[ ENTER STARTUP MENU ]</button>
           </div>
         </div>
@@ -327,6 +353,23 @@ export default function BootScreen({ onBootComplete }) {
         </div>
       )}
 
+      {/* STAGE 2.5: MS-DOS 7.1 Driver Load Stream */}
+      {stage === 'dosload' && (
+        <div className="startup-menu-container mono" style={{ gap: '6px' }}>
+          <div className="startup-title" style={{ color: '#00ffff' }}>Starting Windows 98...</div>
+          <div className="startup-rule" style={{ marginBottom: '10px' }} />
+          <div style={{ color: '#c0c0c0', fontSize: '13px', lineHeight: '1.6' }}>
+            <div>HIMEM: DOS XMS Driver, Version 3.95 (131,072K Extended Memory OK)</div>
+            <div>DEVICEHIGH=C:\SYSTEM\TEAM_AltF4_RAGE_CORE.SYS [ACTIVE]</div>
+            <div>DEVICEHIGH=C:\SYSTEM\NOBROWSE_VIRTUAL_SOCK.SYS [ONLINE]</div>
+            <div>DEVICEHIGH=C:\SYSTEM\CAUGHT_IN_4K_SURVEILLANCE.SYS [READY]</div>
+            <div>DEVICEHIGH=C:\SYSTEM\RAGEWARE_MAIL_P2P.SYS [PORT: 8000]</div>
+            <div>SET BLASTER=A220 I5 D1 H5 P330 T6 [AWE32 SYNTH ACTIVE]</div>
+            <div style={{ color: '#ffff55', marginTop: '6px' }}>C:\WINDOWS&gt; WIN /VER:4.10.1998</div>
+          </div>
+        </div>
+      )}
+
       {/* STAGE 3: Step-by-Step Confirmation Mode */}
       {stage === 'step' && (
         <div className="startup-menu-container mono">
@@ -370,15 +413,15 @@ export default function BootScreen({ onBootComplete }) {
               <tbody>
                 <tr>
                   <td>Processor</td>
-                  <td>Pentium(R) II 450MHz</td>
+                  <td>Pentium(R) II 450MHz MMX</td>
                   <td>Base Memory</td>
                   <td>640 KB</td>
                 </tr>
                 <tr>
                   <td>Co-Processor</td>
-                  <td>Installed (Internal)</td>
+                  <td>Installed (Internal FPU)</td>
                   <td>Extended Memory</td>
-                  <td>64,896 KB</td>
+                  <td>130,432 KB</td>
                 </tr>
                 <tr>
                   <td>Diskette Drive A:</td>
@@ -388,24 +431,31 @@ export default function BootScreen({ onBootComplete }) {
                 </tr>
                 <tr>
                   <td>Display Type</td>
-                  <td>VGA / SVGA 16-Color</td>
+                  <td>SVGA 800x600 16-Bit</td>
                   <td>Primary Slave</td>
                   <td>32X ATAPI CD-ROM</td>
                 </tr>
                 <tr>
+                  <td>Secondary Master</td>
+                  <td>NOBROWSE™ (Vercel Bridge)</td>
+                  <td>Secondary Slave</td>
+                  <td>CAUGHT_IN_4K (AI Vision)</td>
+                </tr>
+                <tr>
                   <td>Authorship Core</td>
                   <td><strong>TEAM AltF4</strong></td>
-                  <td>Cloud Dependencies</td>
-                  <td><strong>0% (Pure Sandbox)</strong></td>
+                  <td>Architecture Origin</td>
+                  <td><strong>100% Scratch-Built React 19</strong></td>
                 </tr>
               </tbody>
             </table>
 
             <div className="pci-irq-strip">
-              <div>PCI DEVICE LISTING:</div>
-              <div>Bus: 0 &bull; Dev: 7 &bull; Func: 0 &bull; Vendor: AltF4_ENG &bull; Class: Cognitive Friction Co-Processor &bull; IRQ: 11</div>
-              <div>Bus: 0 &bull; Dev: 11 &bull; Func: 0 &bull; Vendor: SoundBlaster &bull; Class: WebAudio Multi-Oscillator &bull; IRQ: 5</div>
-              <div>Bus: 0 &bull; Dev: 14 &bull; Func: 0 &bull; Vendor: GestureBridge &bull; Class: Windows Custom Protocol &bull; IRQ: 10</div>
+              <div>PCI / ISA DEVICE INTERRUPT (IRQ) ROUTING TABLE:</div>
+              <div>Bus: 0 &bull; Dev: 7 &bull; Func: 0 &bull; Vendor: AltF4_ENG &bull; Device: Cognitive Friction Co-Processor &bull; IRQ: 11</div>
+              <div>Bus: 0 &bull; Dev: 11 &bull; Func: 0 &bull; Vendor: SoundBlaster &bull; Device: WebAudio AWE32 Multi-Synth &bull; IRQ: 5 (DMA: 1, 5)</div>
+              <div>Bus: 0 &bull; Dev: 14 &bull; Func: 0 &bull; Vendor: GestureBridge &bull; Device: rageware-gesture-drive:// IPC &bull; IRQ: 10</div>
+              <div>Bus: 0 &bull; Dev: 18 &bull; Func: 0 &bull; Vendor: MediaPipe &bull; Device: Local WASM Face Mesh Sensor &bull; IRQ: 12</div>
             </div>
           </div>
 
@@ -419,8 +469,22 @@ export default function BootScreen({ onBootComplete }) {
 
       {/* STAGE 5: Authentic Windows 98 Boot Splash with Animated Marquee */}
       {stage === 'splash' && (
-        <div className="windows-boot-splash">
+        <div 
+          className="windows-boot-splash" 
+          onClick={() => handleImmediateBoot('normal')}
+          title="Click to fast-forward into Desktop"
+        >
           <div className="splash-centerpiece">
+            {/* Classic 4-color Windows Flying Flag Homage */}
+            <div className="splash-flag-icon">
+              <svg width="68" height="52" viewBox="0 0 68 52" fill="none">
+                <polygon points="4,12 30,5 30,25 4,32" fill="#E60000" />
+                <polygon points="36,4 62,11 62,31 36,24" fill="#00A82D" />
+                <polygon points="4,36 30,29 30,49 4,56" fill="#0066CC" />
+                <polygon points="36,28 62,35 62,55 36,48" fill="#FFB300" />
+              </svg>
+            </div>
+
             {/* Windows 98 / RAGEWARE Homage Emblem */}
             <div className="splash-logo-title">
               <span className="splash-brand">RAGEWARE</span>
@@ -443,6 +507,9 @@ export default function BootScreen({ onBootComplete }) {
 
             <div className="splash-copyright mono">
               [C] 1998-2026 TEAM AltF4 &bull; ALL SUBSYSTEMS ENGINEERED FROM SCRATCH
+            </div>
+            <div className="splash-skip-tip mono">
+              Click anywhere to fast-forward
             </div>
           </div>
         </div>
