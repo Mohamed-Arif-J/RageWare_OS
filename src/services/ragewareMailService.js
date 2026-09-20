@@ -10,13 +10,16 @@
  * ZERO database persistence — temporary in-memory state during the active session.
  */
 
+import { Peer } from 'peerjs';
+
 class RagewareMailService {
   constructor() {
     this.ws = null;
-    this.status = 'DISCONNECTED'; // 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED'
+    this.peer = null;
+    this.status = 'CONNECTED'; // Default to CONNECTED in peer mesh mode
     this.mode = 'PEER_MESH'; // 'WEBSOCKET' | 'PEER_MESH'
-    this.currentRoomId = null;
-    this.currentUserId = null; // e.g. "ADHIL"
+    this.currentRoomId = 'GLOBAL';
+    this.currentUserId = null; // e.g. "USERNAME"
     this.onlineUsers = []; // string[]
     
     // In-memory mailbox folders for current session
@@ -170,12 +173,79 @@ class RagewareMailService {
   }
 
   fallbackToPeerMesh() {
-    console.log('[MailService] WebSocket server unavailable; operating in local Peer Mesh mode.');
+    console.log('[MailService] Operating in local/global Peer Mesh mode.');
     this.mode = 'PEER_MESH';
     this.setStatus('CONNECTED', 'PEER_MESH');
 
-    if (this.currentRoomId && this.currentUserId) {
-      this.joinPeerSession(this.currentRoomId, this.currentUserId);
+    if (this.currentUserId) {
+      this.initPeer(this.currentUserId);
+    }
+  }
+
+  // Initialize Global WebRTC Peer for cross-origin / cross-network delivery
+  initPeer(cleanId) {
+    if (!cleanId || typeof window === 'undefined') return;
+    const safeId = cleanId.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const peerId = `rageware-v1-${safeId}`;
+
+    if (this.peer) {
+      try {
+        this.peer.destroy();
+      } catch {}
+      this.peer = null;
+    }
+
+    try {
+      this.peer = new Peer(peerId, { debug: 1 });
+
+      this.peer.on('open', (id) => {
+        console.log('[MailService] Registered global WebRTC Peer ID:', id);
+        this.setStatus('CONNECTED', 'PEER_MESH');
+      });
+
+      this.peer.on('connection', (conn) => {
+        conn.on('data', (data) => {
+          this.handleIncomingPeerData(data);
+        });
+      });
+
+      this.peer.on('error', (err) => {
+        console.warn('[MailService] PeerJS status:', err.type, err.message);
+        if (err.type === 'unavailable-id') {
+          // If ID already registered (e.g. recent tab refresh), connect with dynamic suffix
+          const fallbackId = `rageware-v1-${safeId}-${Math.floor(Math.random() * 1000)}`;
+          try {
+            this.peer = new Peer(fallbackId);
+            this.peer.on('connection', (conn) => {
+              conn.on('data', (data) => this.handleIncomingPeerData(data));
+            });
+          } catch {}
+        }
+      });
+    } catch (err) {
+      console.warn('[MailService] PeerJS init error:', err);
+    }
+  }
+
+  handleIncomingPeerData(data) {
+    if (!data) return;
+    if (data.type === 'PEER_MAIL') {
+      const msg = data.message;
+      if (!msg) return;
+      const cleanRecipient = msg.recipient.toUpperCase().replace(/@RAGEWARE$/i, '');
+      if (cleanRecipient === this.currentUserId) {
+        if (!this.folders.inbox.some((m) => m.id === msg.id)) {
+          this.folders.inbox = [msg, ...this.folders.inbox];
+          if (!this.onlineUsers.includes(msg.sender)) {
+            this.onlineUsers = [...this.onlineUsers, msg.sender];
+          }
+          this.emit({
+            type: 'NEW_MESSAGE',
+            message: msg,
+            folders: { ...this.folders },
+          });
+        }
+      }
     }
   }
 
@@ -400,6 +470,9 @@ class RagewareMailService {
     this.currentUserId = ragewareId;
     this.onlineUsers = [ragewareId];
 
+    // Connect to global WebRTC network via PeerJS
+    this.initPeer(ragewareId);
+
     // Announce to other tabs/windows
     this.broadcastPeer({
       type: 'PEER_USER_JOIN',
@@ -453,8 +526,30 @@ class RagewareMailService {
       });
     }
 
-    // In Peer Mesh mode: Save in Sent & Broadcast to peers
+    // Save in Sent folder locally
     this.folders.sent = [msg, ...this.folders.sent];
+
+    // 1. Deliver directly across the Internet (Vercel <-> Localhost <-> Remote devices) via PeerJS WebRTC
+    if (this.peer && !this.peer.destroyed) {
+      const targetSafeId = cleanTo.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      const targetPeerId = `rageware-v1-${targetSafeId}`;
+      try {
+        const conn = this.peer.connect(targetPeerId, { reliable: true });
+        conn.on('open', () => {
+          conn.send({ type: 'PEER_MAIL', message: msg });
+          setTimeout(() => {
+            try { conn.close(); } catch {}
+          }, 2000);
+        });
+        conn.on('error', (err) => {
+          console.log('[MailService] Direct peer delivery notice:', err);
+        });
+      } catch (err) {
+        console.warn('[MailService] PeerJS send error:', err);
+      }
+    }
+
+    // 2. Deliver via BroadcastChannel & LocalStorage (for same-origin tabs)
     this.broadcastPeer({
       type: 'PEER_MESSAGE',
       roomId: this.currentRoomId,
@@ -502,6 +597,13 @@ class RagewareMailService {
   // Leave active session and clear temporary state
   leaveSession() {
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+
+    if (this.peer) {
+      try {
+        this.peer.destroy();
+      } catch {}
+      this.peer = null;
+    }
 
     if (this.mode === 'WEBSOCKET' && this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.sendJson({ type: 'LEAVE_ROOM' });
