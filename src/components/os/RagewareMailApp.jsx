@@ -28,11 +28,9 @@ export default function RagewareMailApp({
 }) {
   // Session Identity State
   const [sessionJoined, setSessionJoined] = useState(
-    Boolean(ragewareMailService.currentRoomId && ragewareMailService.currentUserId)
+    Boolean(ragewareMailService.currentUserId)
   );
   const [inputId, setInputId] = useState(ragewareMailService.currentUserId || '');
-  const [createRoomCode, setCreateRoomCode] = useState(ragewareMailService.currentRoomId || generateRoomCode());
-  const [joinRoomCode, setJoinRoomCode] = useState('');
   
   // Connection & Room State
   const [connectionStatus, setConnectionStatus] = useState(ragewareMailService.status);
@@ -157,47 +155,33 @@ export default function RagewareMailApp({
     return () => unsubscribe();
   }, [selectedMessageId, onRageUpdate]);
 
-  // Handle Joining or Creating Session with explicit room code and mode
-  const handleConnectWithRoom = (roomCode, mode) => {
+  // Handle Entering Mail with RAGEWARE ID
+  const handleEnterWithId = (e) => {
+    if (e) e.preventDefault();
     const cleanId = inputId.trim().toUpperCase().replace(/@rageware$/i, '');
-    const cleanRoom = roomCode ? roomCode.trim().toUpperCase() : '';
 
     if (!cleanId || cleanId.length < 2 || cleanId.length > 18) {
       setDialogError({
         title: 'RAGEWARE MAIL',
-        message: 'Step 1 Incomplete: Please enter your Temporary RAGEWARE ID (2-18 characters) first.',
-      });
-      soundEngine.playChord();
-      return;
-    }
-
-    if (!cleanRoom || cleanRoom.length < 2) {
-      setDialogError({
-        title: 'RAGEWARE MAIL',
-        message: mode === 'join' 
-          ? 'Please enter your friend\'s 5-letter Room Code in Option B.' 
-          : 'Invalid session room code.',
+        message: 'Invalid RAGEWARE ID.\nPlease enter a 2-18 character username.',
       });
       soundEngine.playChord();
       return;
     }
 
     soundEngine.playClick();
-    ragewareMailService.joinSession(cleanRoom, cleanId);
+    ragewareMailService.joinSession(cleanId);
   };
 
-  // Handle Leave Session / Return to Welcome Screen
-  const handleLeaveSession = () => {
+  // Handle Changing ID / Return to Welcome Screen
+  const handleChangeId = () => {
     soundEngine.playClick();
     ragewareMailService.leaveSession();
     setSessionJoined(false);
-    setActiveRoomId('');
     setActiveUserId('');
     setOnlineUsers([]);
     setFolders({ inbox: [], sent: [], drafts: [], trash: [] });
     setSelectedMessageId(null);
-    setCreateRoomCode(generateRoomCode());
-    setJoinRoomCode('');
   };
 
   // Handle Compose open
@@ -332,158 +316,55 @@ export default function RagewareMailApp({
         </div>
 
         {/* Wizard Body Form */}
-        <div style={{ maxWidth: '480px', margin: '0 auto', width: '100%' }}>
-          {/* STEP 1: IDENTITY */}
-          <div className="win95-fieldset" style={{ marginBottom: '12px' }}>
-            <legend style={{ fontWeight: 'bold', color: '#000080' }}>1. Your Temporary RAGEWARE ID (Username)</legend>
-            <div style={{ fontSize: '11px', color: '#555555', marginBottom: '6px' }}>
-              This is your personal username. Friends will use this to address mail to you.
+        <form onSubmit={handleEnterWithId} style={{ maxWidth: '440px', margin: '0 auto', width: '100%' }}>
+          <div className="win95-fieldset" style={{ marginBottom: '16px' }}>
+            <legend style={{ fontWeight: 'bold', color: '#000080' }}>Choose Temporary RAGEWARE ID</legend>
+            <div style={{ fontSize: '11px', color: '#555555', marginBottom: '8px' }}>
+              Choose your temporary username. Messages addressed to you will arrive in real-time.
             </div>
-            <div style={{ marginBottom: '8px' }}>
+            <div style={{ marginBottom: '10px' }}>
               <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold', fontSize: '11px' }}>
                 Temporary RAGEWARE ID:
               </label>
               <input
                 type="text"
                 className="win95-input"
-                style={{ width: '100%', textTransform: 'uppercase', fontWeight: inputId ? 'bold' : 'normal', fontSize: '12px' }}
+                style={{ width: '100%', textTransform: 'uppercase', fontWeight: inputId ? 'bold' : 'normal', fontSize: '13px', padding: '4px 6px' }}
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value.toUpperCase())}
                 placeholder="e.g. ADHIL"
                 maxLength={18}
                 autoFocus
+                required
               />
             </div>
             <div style={{
               background: '#FFFFFF',
               border: '1px solid #808080',
-              padding: '6px 8px',
+              padding: '8px 10px',
               fontSize: '11px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
             }}>
-              <span style={{ fontWeight: '500' }}>Your Mail Address:</span>
-              <strong style={{ color: '#000080' }}>
+              <span style={{ fontWeight: '500' }}>Your RAGEWARE Address:</span>
+              <strong style={{ color: '#000080', fontSize: '12px' }}>
                 {(inputId && inputId.trim() ? inputId.trim().toUpperCase() : 'USERNAME')}@RAGEWARE
               </strong>
-            </div>
-          </div>
-
-          {/* STEP 2: TWO DISTINCT ACTIONS WITH SEPARATE BUTTONS */}
-          <div className="win95-fieldset" style={{ marginBottom: '12px' }}>
-            <legend style={{ fontWeight: 'bold', color: '#000080' }}>2. Choose How to Connect (Room Selection)</legend>
-            
-            {/* ACTION CARD 1: CREATE NEW ROOM */}
-            <div style={{
-              background: '#F8F9FA',
-              border: '2px groove #FFFFFF',
-              padding: '10px 12px',
-              marginBottom: '10px',
-            }}>
-              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#000080', marginBottom: '4px' }}>
-                ★ OPTION A: Create New Session (You Host)
-              </div>
-              <div style={{ fontSize: '10px', color: '#555555', marginBottom: '8px' }}>
-                Generates a room for you. Share this code with friends so they can join you:
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Room Code:</span>
-                <input
-                  type="text"
-                  className="win95-input mono"
-                  style={{
-                    width: '95px',
-                    textTransform: 'uppercase',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    letterSpacing: '2px',
-                    textAlign: 'center',
-                    background: '#FFFFFF',
-                    color: '#000080',
-                  }}
-                  value={createRoomCode}
-                  readOnly
-                />
-                <button
-                  type="button"
-                  className="win95-btn btn-sm"
-                  onClick={() => setCreateRoomCode(generateRoomCode())}
-                  title="Generate another code"
-                >
-                  ⟳ New Code
-                </button>
-              </div>
-              <button
-                type="button"
-                className="win95-btn default-btn"
-                style={{ width: '100%', fontWeight: 'bold', padding: '6px 10px' }}
-                onClick={() => handleConnectWithRoom(createRoomCode, 'create')}
-              >
-                ★ CREATE ROOM ({createRoomCode}) & ENTER ▶
-              </button>
-            </div>
-
-            <div style={{ textAlign: 'center', margin: '4px 0 8px 0', fontSize: '11px', fontWeight: 'bold', color: '#666666' }}>
-              — OR —
-            </div>
-
-            {/* ACTION CARD 2: JOIN FRIEND'S ROOM */}
-            <div style={{
-              background: '#F8F9FA',
-              border: '2px groove #FFFFFF',
-              padding: '10px 12px',
-            }}>
-              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#006600', marginBottom: '4px' }}>
-                ➜ OPTION B: Join Friend's Session (They Host)
-              </div>
-              <div style={{ fontSize: '10px', color: '#555555', marginBottom: '8px' }}>
-                Enter the 5-letter code given to you by the friend who created the session:
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Enter Code:</span>
-                <input
-                  type="text"
-                  className="win95-input mono"
-                  style={{
-                    width: '110px',
-                    textTransform: 'uppercase',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    letterSpacing: '2px',
-                    textAlign: 'center',
-                    color: '#006600',
-                    background: '#FFFFFF',
-                  }}
-                  value={joinRoomCode}
-                  onChange={(e) => setJoinRoomCode(e.target.value.toUpperCase())}
-                  placeholder="e.g. 7K4P9"
-                  maxLength={10}
-                />
-              </div>
-              <button
-                type="button"
-                className="win95-btn"
-                style={{ width: '100%', fontWeight: 'bold', padding: '6px 10px', color: '#006600' }}
-                onClick={() => handleConnectWithRoom(joinRoomCode, 'join')}
-              >
-                ➜ JOIN SESSION ({joinRoomCode.trim() || 'ENTER CODE'}) & ENTER ▶
-              </button>
             </div>
           </div>
 
           <div style={{
             border: '1px dashed #808080',
             backgroundColor: '#FFF9D2',
-            padding: '8px 10px',
-            fontSize: '10px',
+            padding: '10px 12px',
+            fontSize: '11px',
             lineHeight: '1.4',
-            marginBottom: '14px',
+            marginBottom: '16px',
             color: '#404040',
           }}>
-            <strong>REAL-TIME PEER SYNCHRONIZATION:</strong><br />
-            Works instantly across tabs and browser windows on <em>rageware-os.vercel.app</em>.<br />
-            Open two browser tabs or windows side-by-side to send real-time mail between users!
+            <strong>REAL-TIME PEER MESSAGING:</strong><br />
+            No room codes needed! Enter your ID to connect instantly. Open a second browser tab or window to exchange real-time messages between different user IDs.
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
@@ -495,8 +376,15 @@ export default function RagewareMailApp({
             >
               Cancel
             </button>
+            <button
+              type="submit"
+              className="win95-btn default-btn"
+              style={{ fontWeight: 'bold', padding: '6px 20px', minWidth: '220px', color: '#000080' }}
+            >
+              ★ ENTER RAGEWARE MAIL ▶
+            </button>
           </div>
-        </div>
+        </form>
 
         {/* Retro Error Dialog */}
         {dialogError && (
@@ -607,7 +495,7 @@ export default function RagewareMailApp({
 
         <button 
           className="win95-btn btn-sm"
-          onClick={handleLeaveSession}
+          onClick={handleChangeId}
           style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -618,9 +506,9 @@ export default function RagewareMailApp({
             border: '2px outset #FFFFFF',
             padding: '2px 8px',
           }}
-          title="Return to welcome screen to change your ID or switch session room"
+          title="Change your RAGEWARE ID or log out"
         >
-          <span>⟵ Change ID / Switch Room</span>
+          <span>⟵ Change ID / Log Out</span>
         </button>
 
         <button 
@@ -968,15 +856,15 @@ export default function RagewareMailApp({
 
         <div className="sunken" style={{ flex: 1, padding: '1px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', overflow: 'hidden' }}>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            Session: <strong>{activeRoomId}</strong> | Identity: <strong style={{ color: '#000080' }}>{activeUserId}@RAGEWARE</strong>
+            My Address: <strong style={{ color: '#000080' }}>{activeUserId}@RAGEWARE</strong>
           </span>
           <button
             className="win95-btn btn-sm"
             style={{ fontSize: '10px', padding: '0 6px', height: '18px', marginLeft: '6px', cursor: 'pointer' }}
-            onClick={handleLeaveSession}
-            title="Leave this session and return to the welcome screen"
+            onClick={handleChangeId}
+            title="Change your temporary ID"
           >
-            Change...
+            Change ID...
           </button>
         </div>
 

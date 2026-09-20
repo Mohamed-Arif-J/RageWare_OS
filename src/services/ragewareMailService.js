@@ -366,10 +366,21 @@ class RagewareMailService {
     }
   }
 
-  // Join or Create a Temporary Session
-  joinSession(roomId, ragewareId) {
-    this.currentRoomId = roomId ? roomId.trim().toUpperCase() : null;
-    this.currentUserId = ragewareId ? ragewareId.trim().toUpperCase() : null;
+  // Join or Create a Temporary Session (defaults to GLOBAL room)
+  joinSession(arg1, arg2) {
+    let cleanId;
+    let cleanRoom;
+
+    if (arg2 !== undefined) {
+      cleanRoom = arg1;
+      cleanId = arg2;
+    } else {
+      cleanRoom = 'GLOBAL';
+      cleanId = arg1;
+    }
+
+    this.currentRoomId = (cleanRoom || 'GLOBAL').trim().toUpperCase();
+    this.currentUserId = cleanId ? cleanId.trim().toUpperCase() : null;
 
     if (this.mode === 'WEBSOCKET' && this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.sendJson({
