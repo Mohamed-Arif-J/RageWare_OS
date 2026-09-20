@@ -10,16 +10,6 @@ import { soundEngine } from '../../engine/soundEngine';
 import { increaseRage, RAGE_EVENTS } from '../../engine/rageEngine';
 import { osPersonalityInstance } from '../../engine/osPersonality';
 
-// Generate a random 5-character uppercase alphanumeric room code
-function generateRoomCode() {
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let code = '';
-  for (let i = 0; i < 5; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
-
 export default function RagewareMailApp({ 
   onClose, 
   onRageUpdate,
@@ -32,10 +22,9 @@ export default function RagewareMailApp({
   );
   const [inputId, setInputId] = useState(ragewareMailService.currentUserId || '');
   
-  // Connection & Room State
+  // Connection & User State
   const [connectionStatus, setConnectionStatus] = useState(ragewareMailService.status);
   const [connectionMode, setConnectionMode] = useState(ragewareMailService.mode);
-  const [activeRoomId, setActiveRoomId] = useState(ragewareMailService.currentRoomId || '');
   const [activeUserId, setActiveUserId] = useState(ragewareMailService.currentUserId || '');
   const [onlineUsers, setOnlineUsers] = useState(ragewareMailService.onlineUsers || []);
   
@@ -75,7 +64,6 @@ export default function RagewareMailApp({
 
         case 'JOIN_SUCCESS':
           setSessionJoined(true);
-          setActiveRoomId(event.roomId);
           setActiveUserId(event.ragewareId);
           setOnlineUsers(event.users || []);
           if (event.folders) setFolders({ ...event.folders });
@@ -364,7 +352,7 @@ export default function RagewareMailApp({
             color: '#404040',
           }}>
             <strong>REAL-TIME PEER MESSAGING:</strong><br />
-            No room codes needed! Enter your ID to connect instantly. Open a second browser tab or window to exchange real-time messages between different user IDs.
+            Enter your ID to connect instantly. Open a second browser tab or window to exchange real-time messages between different user IDs.
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
