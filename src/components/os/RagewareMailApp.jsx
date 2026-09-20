@@ -320,7 +320,7 @@ export default function RagewareMailApp({
                 style={{ width: '100%', textTransform: 'uppercase', fontWeight: inputId ? 'bold' : 'normal', fontSize: '13px', padding: '4px 6px' }}
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value.toUpperCase())}
-                placeholder="e.g. ADHIL"
+                placeholder="e.g. USERNAME"
                 maxLength={18}
                 autoFocus
                 required
@@ -583,7 +583,7 @@ export default function RagewareMailApp({
             })}
           </div>
 
-          {/* Active Session & Online Users Strip */}
+          {/* Active Identity & Online Users Strip */}
           <div style={{
             borderTop: '1px solid #808080',
             padding: '6px',
@@ -591,7 +591,7 @@ export default function RagewareMailApp({
             backgroundColor: '#C0C0C0',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-              <span style={{ fontWeight: 'bold' }}>ROOM:</span>
+              <span style={{ fontWeight: 'bold' }}>MY ID:</span>
               <span className="mono" style={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #808080',
@@ -599,7 +599,7 @@ export default function RagewareMailApp({
                 fontWeight: 'bold',
                 color: '#000080',
               }}>
-                {activeRoomId}
+                {activeUserId}@RAGEWARE
               </span>
             </div>
 
