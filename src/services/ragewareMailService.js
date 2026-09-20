@@ -490,14 +490,10 @@ class RagewareMailService {
 
   // Leave active session and clear temporary state
   leaveSession() {
-    this.explicitDisconnect = true;
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
 
     if (this.mode === 'WEBSOCKET' && this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.sendJson({ type: 'LEAVE_ROOM' });
-      try {
-        this.ws.close();
-      } catch {}
     } else {
       this.broadcastPeer({
         type: 'PEER_USER_LEFT',
@@ -506,8 +502,6 @@ class RagewareMailService {
       });
     }
 
-    this.ws = null;
-    this.setStatus('DISCONNECTED');
     this.currentRoomId = null;
     this.currentUserId = null;
     this.onlineUsers = [];
