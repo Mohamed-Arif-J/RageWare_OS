@@ -2,7 +2,7 @@
 
 
 
-# RageWare OS 🎯
+# RAGEWARE OS 🎯
 
 
 ## Basic Details
@@ -218,33 +218,227 @@ RAGEWARE is an intentionally hostile, retro operating system simulation styled a
 
 The entire application runs 100% client-side inside the browser with zero backend server, database, or external cloud API requirements.
 
-# Screenshots (Add at least 3)
-<img width="1521" height="730" alt="image" src="https://github.com/user-attachments/assets/2fa2d3ec-0338-4761-94e9-301089994a31" />
-Dashboard
-<img width="1435" height="666" alt="image" src="https://github.com/user-attachments/assets/6b586ae8-5311-4010-bcdf-29f81f5bbb4e" />
-booting
 
-<img width="887" height="496" alt="image" src="https://github.com/user-attachments/assets/ac9b8351-e70c-4e6b-b711-c88311fd0941" />
-booting
+---
 
-<img width="1520" height="726" alt="image" src="https://github.com/user-attachments/assets/9b7e161d-7074-45f0-8239-152898d7f744" />
-desktop
+# Core Applications & Chaos Mechanics
 
-<img width="1521" height="728" alt="image" src="https://github.com/user-attachments/assets/ef74fa2c-61fc-44e3-8fb3-5328dc2813b3" />
-NASS Application
+## 1. RAGEWARE MAIL
 
-<img width="1527" height="729" alt="image" src="https://github.com/user-attachments/assets/36b98d34-789c-4aea-ac56-0373014fc1f0" />
-optical sensor
+RAGEWARE Mail is a satirical Windows 95/98-era email client with authentic retro styling, split-pane navigation, folder hierarchies, message threading, and real-time communication.
 
-<img width="1518" height="747" alt="image" src="https://github.com/user-attachments/assets/de68e577-70ce-460c-9c49-3c573d193210" />
-Drive by gesture
+### Key Features
+- Inbox, Sent Items, Drafts, and Trash
+- Temporary RAGEWARE IDs and online-user presence
+- Real-time WebSocket messaging
+- Split-pane message reader with From, Date, Subject, and body
+- Compose, Reply, and thread tracking
+- Windows 95-style system-tray notifications
+- Offline/local fallback and reactive folder synchronization
 
-<img width="1523" height="730" alt="image" src="https://github.com/user-attachments/assets/82931935-70c1-4dc8-91ce-bd99bed99e28" />
-other elements in the os like task manager, musics,videos ets
+### Architecture
+- React Hooks: `useState`, `useEffect`, `useRef`
+- `ragewareMailService` event-driven pub/sub service
+- WebSocket communication with temporary in-memory state
+- `soundEngine` and `osPersonalityInstance`
+- Dynamic thread caching
 
+### Chaos Mechanics
+- Random urgent spam and corporate-buzzword messages
+- Sarcastic OS commentary
+- Comedic validation dialogs
+- Additional friction after repeated mail actions
+
+## 2. NOTEPAD 98 AI EDITION
+
+A pixel-focused recreation of classic Windows Notepad enhanced with simulated AI sabotage.
+
+### Key Features
+- Plain-text editing
+- Line, column, and word-count status information
+- Virtual filesystem integration
+- Ctrl+S / Ctrl+N keyboard shortcuts
+- Safe Mode and Chaos Mode
+
+### Chaos Mechanics
+- Malicious auto-correction such as `work → procrastination`, `help → no`, `code → spaghetti`, and `save → delete`
+- Chaotic Backspace with a chance of inserting bizarre characters
+- Simulated key sticking and random duplicate keystrokes
+
+## 3. CALCULATOR
+
+An authentic Windows 95-style calculator with a classic button grid, sunken numeric display, floating-point arithmetic, and calculation history.
+
+### Key Features
+- Addition, subtraction, multiplication, and division
+- Reciprocal, square root, percentage, and sign toggle
+- Chained expressions and calculation history
+- Overflow and division-by-zero protection
+- Integration with the Rage Engine
+
+### Chaos Mechanics
+- Evasive buttons under high rage levels
+- Temporary plus/minus label swaps
+- Fake mathematical error dialogs
+- Artificial processing delays for simple calculations
+
+## 4. CALENDAR & SCHEDULE
+
+A retro Date & Time Properties-inspired calendar with month/year navigation, live time, and fictional appointments.
+
+### Key Features
+- Gregorian calendar logic
+- Leap-year handling and correct weekday offsets
+- Live analog/digital clock
+- Fictional bureaucratic appointments
+- Date-specific Easter eggs
+
+### Chaos Mechanics
+Repeated date clicks trigger escalating commentary, from harmless observations to increasingly irritated OS responses.
+
+## 5. PAINT 95
+
+A faithful Windows 95 MS Paint recreation with classic drawing tools, dual colour swatches, canvas previews, undo/redo, file export, and an AI art critic.
+
+### Key Features
+- Pencil, Paintbrush, Eraser, Airbrush
+- Paint Bucket, Line, Curve
+- Rectangle, Rounded Rectangle, Ellipse, Polygon
+- Text, Eyedropper, Magnifier/Zoom
+- 28-colour palette
+- Foreground/background colour system
+- 25-step rasterized undo/redo history
+- PNG/BMP export through the virtual filesystem
+
+### Architecture & Algorithms
+- React + HTML5 2D Canvas
+- Dual-canvas base/overlay architecture
+- BFS flood-fill using Canvas ImageData
+- Poisson-style airbrush spray distribution
+
+### Chaos Mechanics
+- AI Art Critic delivers sarcastic artwork reviews
+- Random stray pixels
+- Slight eraser-size variations in Chaos Mode
+
+## 6. BATTERY STATUS MONITOR
+
+A dramatic fake hardware power manager designed to simulate a critical battery failure.
+
+### Key Features
+- Battery percentage and voltage display
+- AC power indicators
+- Segmented vintage power meter
+- CRT scanline power-saving overlay
+- Emergency actions: Connect AC Adapter, Reboot in Safe Mode, and Pray
+
+### Chaos Mechanics
+A fake 1% battery event can trigger a countdown and theatrical blackout. The Pray button responds with a deliberately useless message.
+
+## 7. SYSTEM WORKSTATION LOCK
+
+A simulated Windows NT/95 workstation lock screen that remains safely inside the browser sandbox.
+
+### Key Features
+- Registered owner and machine name
+- Password challenge
+- Full-screen desktop overlay
+- No host OS keystroke interception
+- Safe-mode unlock behaviour
+- Retro hardware/error sounds
+
+### Chaos Mechanics
+- First unlock attempt can be rejected with a fake error
+- Unlock button can dodge the cursor
+- Artificial credential verification stall
+- Sarcastic OS response after unlocking
+
+## 8. CAUGHT IN 4K
+
+A live AI computer-vision experience embedded inside a retro RAGEWARE window.
+
+**Live URL:** https://caught-in-4k-rho.vercel.app/
+
+Technology includes React, FastAPI, PyTorch, Moondream2, Qwen2.5-0.5B-Instruct, Sentence-Transformers, Hugging Face Transformers, MediaDevices/getUserMedia, react-webcam, Modal Serverless GPU, and Vercel.
+
+## 9. NOBROWSE™
+
+An intentionally unpredictable AI browser embedded directly into a chrome-less retro window.
+
+**Live URL:** https://nobrowser.vercel.app/
+
+Built with JavaScript, HTML5, CSS3, Next.js/React, Vercel deployment, and a tailored minimalist CSS engine.
+
+## 10. NaaS — Nothing as a Service
+
+A live web application integrated into RAGEWARE OS.
+
+Technology includes React, Express, Node.js, Axios, Mongoose, CORS, dotenv, MongoDB Atlas, Render, Vite, npm, and Nodemon.
+
+## 11. RETRO MEDIA GALLERY & SOUND VAULT
+
+A simulated in-memory media archive containing vintage hardware photography and retro audio content through `virtualFs.js`, including IBM PC 5150, floppy disks, Nintendo Game Boy, Sony PlayStation, and curated 80s/90s/2000s-era audio.
+
+---
+
+# Technical Architecture
+
+RAGEWARE combines a React desktop shell, virtual filesystem, modular applications, audio/personality services, interaction tracking, and an adaptive Rage Engine. Optional external applications communicate through their own services while remaining visually embedded inside the same retro OS.
+
+The real-time RAGEWARE Mail feature uses a temporary WebSocket server and in-memory rooms. It does not require a permanent mail database or real SMTP/IMAP service.
+
+> RAGEWARE is a browser-based simulation. It does not claim to diagnose emotions or mental health conditions.
+
+# Screenshots
+
+![Dashboard](https://github.com/user-attachments/assets/2fa2d3ec-0338-4761-94e9-301089994a31)
+
+*RAGEWARE desktop dashboard and primary operating-system environment.*
+
+![Boot Screen](https://github.com/user-attachments/assets/6b586ae8-5311-4010-bcdf-29f81f5bbb4e)
+
+*Retro boot sequence introducing the simulated operating system.*
+
+![Booting](https://github.com/user-attachments/assets/ac9b8351-e70c-4e6b-b711-c88311fd0941)
+
+*Additional boot-stage interface.*
+
+![Desktop](https://github.com/user-attachments/assets/9b7e161d-7074-45f0-8239-152898d7f744)
+
+*Main Windows 95/98-inspired desktop environment.*
+
+![NaaS Application](https://github.com/user-attachments/assets/ef74fa2c-61fc-44e3-8fb3-5328dc2813b3)
+
+*NaaS application running inside RAGEWARE.*
+
+![Optical Sensor](https://github.com/user-attachments/assets/36b98d34-789c-4aea-ac56-0373014fc1f0)
+
+*Optical-sensor / computer-vision experience.*
+
+![Gesture Drive](https://github.com/user-attachments/assets/de68e577-70ce-460c-9c49-3c573d193210)
+
+*Gesture Drive interaction.*
+
+![Additional OS Elements](https://github.com/user-attachments/assets/82931935-70c1-4dc8-91ce-bd99bed99e28)
+
+*Additional OS elements including task manager, music, video, and other applications.*
 
 # Diagrams
-<img width="1376" height="768" alt="image" src="https://github.com/user-attachments/assets/50b76ead-2a44-409b-93ad-34b96e9e8180" />
+
+<img width="1376" height="768" alt="RAGEWARE architecture diagram" src="https://github.com/user-attachments/assets/50b76ead-2a44-409b-93ad-34b96e9e8180" />
+
+*RAGEWARE system architecture and interaction workflow.*
+
+### Real-Time RAGEWARE Mail
+
+```mermaid
+flowchart LR
+A[Computer A<br/>RAGEWARE<br/>ADHIL95] <-->|WebSocket| S[Temporary RAGEWARE<br/>Communication Server]
+B[Computer B<br/>RAGEWARE<br/>ALEX95] <-->|WebSocket| S
+S --> M[(Temporary<br/>In-Memory State)]
+```
+
+*Temporary two-user communication architecture. Active rooms and messages exist only in memory during the session.*
 
 
 
