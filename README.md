@@ -1,520 +1,470 @@
-<img width="1280" height="640" alt="git (1)" src="https://github.com/user-attachments/assets/8920b256-2ba8-4988-b824-5351134eb4bd" />
-
-
+<img width="1280" height="640" alt="RAGEWARE OS" src="https://github.com/user-attachments/assets/8920b256-2ba8-4988-b824-5351134eb4bd" />
 
 # RAGEWARE OS 🎯
 
-
 ## Basic Details
+
 ### Team Name: AltF4
 
-
 ### Team Members
-- Team Lead: Mohamed Arif J - [Jawaharlal college of engineering and technology]
-- Member 2: Adhil V T - [Jawaharlal college of engineering and technology]
+- Team Lead: Mohamed Arif J - Jawaharlal College of Engineering and Technology
+- Member 2: Adhil V T - Jawaharlal College of Engineering and Technology
 
 ### Project Description
-**RAGEWARE** is an interactive, browser-based simulation of a retro 1990s desktop operating system (styled after Windows 95 and Windows 98). Rather than presenting separate, disjointed mini-games, **the operating system itself serves as the interactive environment**. As the user performs common computing tasks—such as browsing files, typing commands, running system updates, or adjusting settings—the system actively monitors user behavior and becomes progressively uncooperative, sarcastic, and hostile. 
-The application observes behavioral indicators (such as rapid clicking, repeated failed button clicks, attempts to close warning dialogs, and post-failure facial activity via an optional webcam sensor). It feeds these signals into a dynamic **Rage Engine**, which adapts interface friction to exploit the user's specific behavioral vulnerabilities. We added more useless applications like Caught In 4K, NOBROWSE™, NAAS, and Gesture Drive.
+**RAGEWARE OS** is an interactive browser-based simulation of a retro 1990s desktop operating system inspired by Windows 95/98. The operating system itself is the playground: users browse files, open applications, type commands, change settings, and interact with deliberately inconvenient system behaviour.
+
+A dynamic **Rage Engine** observes interaction patterns such as rapid clicking, repeated failed actions, dismissals, and other visible UI interactions, then introduces controlled interface friction. The OS also contains intentionally useless applications such as RAGEWARE Mail, NOBROWSE™, NaaS, Caught in 4K, Gesture Drive, Paint 95, and more.
 
 ### The Problem (that doesn't exist)
-Modern software engineering and HCI tries to make interfaces smooth, simple, and user-friendly.
-RAGEWARE said: “No.”
-Instead, it explores how an interface can detect when a user is slowly losing their patience through their actions—without cameras, biometrics, or mind reading.
-An adaptive system identifies what annoys the user most, whether it's delays, dodging interactions, or annoying pop-ups, and adjusts accordingly.
-Retro OS elements like error messages, progress bars, and modal dialogs are then used to create a carefully engineered amount of suffering.
-The goal? Study human tolerance… one rage quit at a time.
-Note: RAGEWARE is not a medical or psychiatric emotion detector. It simply knows when you've had enough.
+Modern software engineering and HCI usually focuses on reducing friction and making interfaces easier to use.
+
+RAGEWARE explores the exact opposite direction: what happens when a user interface deliberately notices repeated interaction patterns and responds with increasingly inconvenient behaviour?
+
+The project turns common interface elements—error dialogs, loading bars, confirmation boxes, buttons, notifications, and settings—into experimental HCI components. The aim is to explore user tolerance and interaction behaviour in a playful, controlled environment.
 
 ### The Solution (that nobody asked for)
+RAGEWARE creates a complete retro desktop environment where frustration is treated as a system interaction signal rather than simply a failure.
 
-Modern software spends millions of dollars trying to make users happy.
-RAGEWARE respectfully disagrees.
-Instead of removing frustrating experiences, RAGEWARE studies them. The system observes how users interact with an application and estimates when their patience is slowly evaporating into the void.
-Did the page take too long to load?
-Did the user repeatedly click the same button?
-Did they aggressively close another pop-up?
-Did they start moving their mouse like they're trying to physically attack the operating system?
-Perfect. We may have something.
-RAGEWARE analyzes interaction patterns to identify what specifically annoys a user the most—delays, interruptions, unnecessary confirmations, disappearing buttons, suspiciously slow progress bars, or the timeless classic: an error message that explains absolutely nothing.
-Then comes the innovation.
-Instead of fixing the problem immediately, RAGEWARE adapts the experience to provide a scientifically engineered, carefully controlled amount of additional suffering.
-Retro-inspired UI elements such as fake loading bars, cryptic error messages, unnecessary modal dialogs, and progress indicators that somehow move backwards can be dynamically introduced to test one important question:
-How much nonsense can a human tolerate before closing the application with unnecessary force?
-The system does not use cameras.
-It does not read biometrics.
-It does not read minds.
-It simply watches your interaction patterns and thinks:
-"Yeah... this person is one pop-up away from uninstalling everything."
-RAGEWARE's goal is not to make software better.
-At least, not immediately.
-First, we need to understand exactly how much worse we can make it.
-Because before we can build truly user-friendly interfaces, perhaps we should first discover the precise moment when a user whispers:
-"That's it. I'm done."
-And then clicks Exit.
-One rage quit at a time.
+The OS can react to repeated clicks, failed actions, repeated dismissals, delays, and application-specific events. The **Rage Engine** converts these signals into controlled UI changes such as fake errors, delayed actions, moving controls, unnecessary confirmations, sarcastic messages, and other retro-style chaos.
+
+The result is a self-contained HCI sandbox where the user can experience and observe adaptive interface friction without modifying the host operating system.
+
+> **Important:** RAGEWARE is an experimental interface simulation, not a medical, psychiatric, or diagnostic emotion detector. The core Rage Engine works from observable interaction patterns.
 
 ## Technical Details
+
 ### Technologies/Components Used
+
 For Software:
 
-RageWare OS
-[Languages used]
-JavaScript (ES6+)
-JSX
-HTML5
-CSS3
-WebAssembly (WASM)
-Python
-[Frameworks used]
-React.js
-React DOM
-[Libraries used]
-@mediapipe/tasks-vision
-Google MediaPipe Vision Models
-Google Web Fonts
-[Tools used]
-Vite
-@vitejs/plugin-react
-Oxlint
-Web Audio API
-MediaDevices / getUserMedia API
-Local Storage
-Windows Custom Protocol Handler
-Git
-GitHub
+**Languages**
+- JavaScript (ES6+)
+- JSX
+- HTML5
+- CSS3
+- Python 3.10+
+- WebAssembly (WASM)
 
+**Frameworks**
+- React.js
+- React DOM
+- Next.js
+- Express.js
+- FastAPI
 
-NaaS — Nothing as a Service[live webapp Application in RageWare OS]
+**Libraries / Models**
+- @mediapipe/tasks-vision
+- Google MediaPipe Vision Models
+- PyTorch
+- Hugging Face Transformers
+- Moondream2
+- Qwen2.5-0.5B-Instruct
+- Sentence-Transformers / all-MiniLM-L6-v2
+- Axios
+- Mongoose
+- CORS
+- dotenv
+- NumPy
+- Pillow
+- Uvicorn
+- Pydantic
+- python-multipart
+- react-webcam
+- accelerate
+- einops
 
-[Languages used]
-JavaScript
-HTML
-CSS
-[Frameworks used]
-React.js
-Express.js
-Node.js
-[Libraries used]
-Axios
-Mongoose
-CORS
-dotenv
-[Tools used]
-Vite
-MongoDB Atlas
-Render
-Git
-GitHub
-npm
-Nodemon
+**Browser APIs**
+- Web Audio API
+- MediaDevices / getUserMedia
+- Canvas / Blob URL APIs
+- Local Storage
+- Native Date API
 
-Caught in 4K [Live Web App Application in RageWare OS]
-- **Live URL**: https://caught-in-4k-rho.vercel.app/
-- **Description**: Real-time AI computer vision surveillance application running embedded inside an authentic retro window. Tracks facial reactions and emotion telemetry.
+**Tools & Infrastructure**
+- Vite
+- @vitejs/plugin-react
+- Oxlint
+- Node.js
+- npm
+- Git
+- GitHub
+- MongoDB Atlas
+- Render
+- Modal Serverless GPU Cloud Runtime
+- Vercel
 
-[Languages used]
-Python (3.10+)
-JavaScript (ES6+)
-JSX
-HTML5
-CSS3
+For Hardware:
 
-[Frameworks used]
-React.js
-FastAPI
-PyTorch (CUDA / CPU acceleration)
+- No dedicated hardware is required.
+- Modern Chromium-based browser recommended.
+- Keyboard and mouse for the main OS.
+- Optional webcam for the separate Caught in 4K experience.
 
-[Libraries used]
-Vision & NLP Models:
-Moondream2 (vikhyatk/moondream2)
-Qwen2.5-0.5B-Instruct (Qwen/Qwen2.5-0.5B-Instruct)
-Sentence-Transformers (all-MiniLM-L6-v2)
-Machine Learning & Core:
-Hugging Face transformers
-accelerate
-einops
-numpy
+### Implementation
 
-Backend Utilities:
-uvicorn
-Pillow (PIL - Python Imaging Library)
-python-multipart
-requests
-pydantic
-Frontend Packages:
-react-webcam
-axios
-
-[Tools & Infrastructure used]
-Vite
-@vitejs/plugin-react
-Modal (Serverless GPU Cloud Runtime)
-Vercel Cloud
-Git
-GitHub
-MediaDevices / getUserMedia API (Webcam optical frame buffer)
-Canvas / Blob URL Object APIs
-Windows 95/98 Design System (Authentic Retro OS styling)
-
-
-NOBROWSE™ [Live Web App Application in RageWare OS]
-- **Live URL**: https://nobrowser.vercel.app/
-- **Description**: The distraction-free, unpredictable AI browser (40% useful, 60% questionable). Embedded directly inside an authentic retro chrome-less window.
-
-[Languages used]
-JavaScript (ES6+)
-HTML5
-CSS3
-
-[Frameworks & Tools used]
-Next.js / React
-Vercel Cloud Deployment
-Tailored Minimalist CSS Engine
-
-
-Authentic 90s/2000s Media Gallery & Sound Vault [Native File System Feature]
-- **Description**: Curated vintage hardware photography archive and 80s/90s Synthwave/Rock/Pop audio vault stored in the simulated in-memory filesystem (`virtualFs.js`).
-- **Media Archives**:
-  - *IBM PC 5150 Battlestation (1995)*: Vintage green CRT monitor with DOS prompt & mechanical keyboard.
-  - *Floppy Disk Collection*: Authentic 8-inch, 5.25-inch, and 3.5-inch magnetic storage diskettes.
-  - *Nintendo Game Boy (1989)*: Original Dot Matrix Game Boy console.
-  - *Sony PlayStation (1995)*: Classic 32-bit PS1 CD console.
-  - *Audio Tracks*: Rick Astley (1987), a-ha (1985), Harold Faltermeyer (1984), Nirvana (1991), Darude (1999), and Britney Spears (1998).
-
-
-Implementation
 For Software:
 
-Installation
-bash
+#### Installation
+
+```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/rageware.git
-# 2. Navigate to the project directory
-cd rageware
-# 3. Verify Node.js environment (v18.0.0 or higher recommended)
+git clone https://github.com/Mohamed-Arif-J/RageWare_OS.git
+
+# 2. Navigate to the project
+cd RageWare_OS
+
+# 3. Check the environment
 node -v
 npm -v
-# 4. Install dependencies cleanly
+
+# 4. Install dependencies
 npm install
+```
 
+#### Run
 
-Run
-bash
-# Start the local development server
+```bash
+# Start the RAGEWARE development server
 npm run dev
-# (Optional) Run the linter to verify code quality
+
+# Optional: check code quality
 npm run lint
-# (Optional) Build and preview the production bundle locally
+
+# Optional: build for production
 npm run build
+
+# Optional: preview the production build
 npm run preview
+```
 
+#### RAGEWARE Mail Development
 
-Project Documentation
+RAGEWARE Mail can use a temporary WebSocket server for two-user real-time communication.
+
+Terminal 1:
+```bash
+npm run server
+# WebSocket server: ws://localhost:8000
+```
+
+Terminal 2:
+```bash
+npm run dev
+# Frontend: http://localhost:5173
+```
+
+### Project Documentation
+
 For Software:
 
-1. System Overview
-RAGEWARE is an intentionally hostile, retro operating system simulation styled after Windows 95 and Windows 98. Designed as an interactive Human-Computer Interaction (HCI) research sandbox, the system deliberately reverses standard user-experience heuristics to study user tolerance thresholds, adaptive behavioral friction, and procedural interface antagonism.
+#### 1. System Overview
 
-The entire application runs 100% client-side inside the browser with zero backend server, database, or external cloud API requirements.
+RAGEWARE is an intentionally hostile retro operating-system simulation. The browser provides the desktop environment, while modular applications, a virtual filesystem, sound services, personality reactions, and the Rage Engine work together to create the experience.
 
+The core desktop is browser-contained and does not control the host operating system. Individual integrated applications may use their own backend or cloud service where required.
 
----
+#### 2. Core Applications
 
-# Core Applications & Chaos Mechanics
-
-## 1. RAGEWARE MAIL
-
-RAGEWARE Mail is a satirical Windows 95/98-era email client with authentic retro styling, split-pane navigation, folder hierarchies, message threading, and real-time communication.
-
-### Key Features
-- Inbox, Sent Items, Drafts, and Trash
-- Temporary RAGEWARE IDs and online-user presence
+**RAGEWARE Mail**
+- Windows 95/98-style inbox, sent, drafts, and trash
+- Temporary RAGEWARE IDs and session rooms
 - Real-time WebSocket messaging
-- Split-pane message reader with From, Date, Subject, and body
-- Compose, Reply, and thread tracking
-- Windows 95-style system-tray notifications
-- Offline/local fallback and reactive folder synchronization
+- Message threading and reply support
+- System-tray incoming-mail notifications
+- Temporary in-memory state; no SMTP/IMAP or real email account
 
-### Architecture
-- React Hooks: `useState`, `useEffect`, `useRef`
-- `ragewareMailService` event-driven pub/sub service
-- WebSocket communication with temporary in-memory state
-- `soundEngine` and `osPersonalityInstance`
-- Dynamic thread caching
-
-### Chaos Mechanics
-- Random urgent spam and corporate-buzzword messages
-- Sarcastic OS commentary
-- Comedic validation dialogs
-- Additional friction after repeated mail actions
-
-## 2. NOTEPAD 98 AI EDITION
-
-A pixel-focused recreation of classic Windows Notepad enhanced with simulated AI sabotage.
-
-### Key Features
-- Plain-text editing
-- Line, column, and word-count status information
+**Notepad 98 AI Edition**
+- Retro text editor with line, column, and word counts
 - Virtual filesystem integration
-- Ctrl+S / Ctrl+N keyboard shortcuts
 - Safe Mode and Chaos Mode
+- Deliberately chaotic text transformations and keyboard behaviour
 
-### Chaos Mechanics
-- Malicious auto-correction such as `work → procrastination`, `help → no`, `code → spaghetti`, and `save → delete`
-- Chaotic Backspace with a chance of inserting bizarre characters
-- Simulated key sticking and random duplicate keystrokes
-
-## 3. CALCULATOR
-
-An authentic Windows 95-style calculator with a classic button grid, sunken numeric display, floating-point arithmetic, and calculation history.
-
-### Key Features
-- Addition, subtraction, multiplication, and division
-- Reciprocal, square root, percentage, and sign toggle
-- Chained expressions and calculation history
+**Calculator**
+- Classic arithmetic operations
+- Square root, reciprocal, percentage, sign toggle
+- Chained calculations and history
 - Overflow and division-by-zero protection
-- Integration with the Rage Engine
+- Rage-based UI chaos such as label swaps and evasive controls
 
-### Chaos Mechanics
-- Evasive buttons under high rage levels
-- Temporary plus/minus label swaps
-- Fake mathematical error dialogs
-- Artificial processing delays for simple calculations
+**Calendar & Schedule**
+- Gregorian calendar
+- Month/year navigation
+- Leap-year and weekday calculations
+- Live clock
+- Fictional appointments and interaction-based commentary
 
-## 4. CALENDAR & SCHEDULE
-
-A retro Date & Time Properties-inspired calendar with month/year navigation, live time, and fictional appointments.
-
-### Key Features
-- Gregorian calendar logic
-- Leap-year handling and correct weekday offsets
-- Live analog/digital clock
-- Fictional bureaucratic appointments
-- Date-specific Easter eggs
-
-### Chaos Mechanics
-Repeated date clicks trigger escalating commentary, from harmless observations to increasingly irritated OS responses.
-
-## 5. PAINT 95
-
-A faithful Windows 95 MS Paint recreation with classic drawing tools, dual colour swatches, canvas previews, undo/redo, file export, and an AI art critic.
-
-### Key Features
-- Pencil, Paintbrush, Eraser, Airbrush
-- Paint Bucket, Line, Curve
-- Rectangle, Rounded Rectangle, Ellipse, Polygon
-- Text, Eyedropper, Magnifier/Zoom
+**Paint 95**
+- Pencil, brush, eraser, airbrush, bucket, line, curve, shapes, text, eyedropper, and zoom
 - 28-colour palette
-- Foreground/background colour system
-- 25-step rasterized undo/redo history
-- PNG/BMP export through the virtual filesystem
+- 25-step undo/redo
+- PNG/BMP export
+- HTML5 Canvas with dual-canvas architecture
+- BFS flood fill and ImageData operations
+- Optional AI art critic and chaos effects
 
-### Architecture & Algorithms
-- React + HTML5 2D Canvas
-- Dual-canvas base/overlay architecture
-- BFS flood-fill using Canvas ImageData
-- Poisson-style airbrush spray distribution
+**Battery Status Monitor**
+- Simulated battery percentage and voltage
+- AC indicators and segmented power meter
+- CRT scanline overlay
+- Connect AC Adapter, Safe Mode reboot, and Pray actions
+- Deliberately fake low-battery events and blackout effects
 
-### Chaos Mechanics
-- AI Art Critic delivers sarcastic artwork reviews
-- Random stray pixels
-- Slight eraser-size variations in Chaos Mode
-
-## 6. BATTERY STATUS MONITOR
-
-A dramatic fake hardware power manager designed to simulate a critical battery failure.
-
-### Key Features
-- Battery percentage and voltage display
-- AC power indicators
-- Segmented vintage power meter
-- CRT scanline power-saving overlay
-- Emergency actions: Connect AC Adapter, Reboot in Safe Mode, and Pray
-
-### Chaos Mechanics
-A fake 1% battery event can trigger a countdown and theatrical blackout. The Pray button responds with a deliberately useless message.
-
-## 7. SYSTEM WORKSTATION LOCK
-
-A simulated Windows NT/95 workstation lock screen that remains safely inside the browser sandbox.
-
-### Key Features
+**System Workstation Lock**
+- Simulated Windows NT/95 lock screen
 - Registered owner and machine name
 - Password challenge
-- Full-screen desktop overlay
-- No host OS keystroke interception
-- Safe-mode unlock behaviour
-- Retro hardware/error sounds
+- Browser-safe full-screen overlay
+- Fake unlock rejection, delays, and moving controls
 
-### Chaos Mechanics
-- First unlock attempt can be rejected with a fake error
-- Unlock button can dodge the cursor
-- Artificial credential verification stall
-- Sarcastic OS response after unlocking
+**Caught in 4K**
+- AI computer-vision application embedded inside a RAGEWARE window
+- React + FastAPI + PyTorch based architecture
+- Moondream2, Qwen2.5-0.5B-Instruct, Sentence-Transformers and Hugging Face components
+- Optional webcam interaction through MediaDevices / react-webcam
+- GPU inference infrastructure through Modal and deployment through Vercel
+- Live URL: https://caught-in-4k-rho.vercel.app/
 
-## 8. CAUGHT IN 4K
+**NOBROWSE™**
+- Chrome-less unpredictable AI browser
+- Next.js / React implementation
+- Retro OS embedding
+- Live URL: https://nobrowser.vercel.app/
 
-A live AI computer-vision experience embedded inside a retro RAGEWARE window.
+**NaaS — Nothing as a Service**
+- Live web application embedded inside RAGEWARE
+- React, Express, Node.js, Axios, Mongoose, CORS and dotenv
+- MongoDB Atlas backend
+- Render deployment
 
-**Live URL:** https://caught-in-4k-rho.vercel.app/
+**Retro Media Gallery & Sound Vault**
+- Simulated media archive through `virtualFs.js`
+- IBM PC 5150, floppy disks, Nintendo Game Boy and Sony PlayStation references
+- Retro audio collection and sound effects
+- Integrated with the simulated desktop environment
 
-Technology includes React, FastAPI, PyTorch, Moondream2, Qwen2.5-0.5B-Instruct, Sentence-Transformers, Hugging Face Transformers, MediaDevices/getUserMedia, react-webcam, Modal Serverless GPU, and Vercel.
+**Gesture Drive & Optical Sensor**
+- Gesture-based interaction experiments
+- Optical/computer-vision interface components
+- Designed as additional interactive experiments inside the OS
 
-## 9. NOBROWSE™
+#### 3. Rage Engine
 
-An intentionally unpredictable AI browser embedded directly into a chrome-less retro window.
+The Rage Engine is the central interaction layer that turns observable UI behaviour into controlled chaos.
 
-**Live URL:** https://nobrowser.vercel.app/
+Typical signals include:
+- Rapid repeated clicks
+- Repeated failed actions
+- Repeated dismissals
+- Refresh/send attempts
+- Application-specific interaction events
+- Timing and repetition patterns
 
-Built with JavaScript, HTML5, CSS3, Next.js/React, Vercel deployment, and a tailored minimalist CSS engine.
+Possible responses include:
+- Fake error dialogs
+- Artificial delays
+- Moving or dodging buttons
+- Unnecessary confirmation dialogs
+- Sarcastic system messages
+- Fake loading/progress behaviour
+- Random UI quirks
+- Sound and personality reactions
 
-## 10. NaaS — Nothing as a Service
+The goal is not to diagnose a user's emotional state. It is to demonstrate how an interface can adapt to interaction behaviour.
 
-A live web application integrated into RAGEWARE OS.
+#### 4. RAGEWARE Mail
 
-Technology includes React, Express, Node.js, Axios, Mongoose, CORS, dotenv, MongoDB Atlas, Render, Vite, npm, and Nodemon.
+RAGEWARE Mail provides temporary two-user communication inside the retro OS.
 
-## 11. RETRO MEDIA GALLERY & SOUND VAULT
+- Users choose temporary IDs such as `ADHIL95` and `ALEX95`.
+- A shared five-character room code connects users.
+- Messages are delivered through WebSocket communication.
+- Active rooms and messages are kept in temporary in-memory state.
+- There is no real email account, SMTP, IMAP, Gmail API, Outlook API, or OAuth integration.
+- The frontend can remain hosted separately while the real-time service is configured through `VITE_RAGEWARE_REALTIME_URL`.
 
-A simulated in-memory media archive containing vintage hardware photography and retro audio content through `virtualFs.js`, including IBM PC 5150, floppy disks, Nintendo Game Boy, Sony PlayStation, and curated 80s/90s/2000s-era audio.
+### Project Documentation — Screenshots
 
----
-
-# Technical Architecture
-
-RAGEWARE combines a React desktop shell, virtual filesystem, modular applications, audio/personality services, interaction tracking, and an adaptive Rage Engine. Optional external applications communicate through their own services while remaining visually embedded inside the same retro OS.
-
-The real-time RAGEWARE Mail feature uses a temporary WebSocket server and in-memory rooms. It does not require a permanent mail database or real SMTP/IMAP service.
-
-> RAGEWARE is a browser-based simulation. It does not claim to diagnose emotions or mental health conditions.
-
-# Screenshots
+# Screenshots (Add at least 3)
 
 ![Dashboard](https://github.com/user-attachments/assets/2fa2d3ec-0338-4761-94e9-301089994a31)
 
-*RAGEWARE desktop dashboard and primary operating-system environment.*
+*RAGEWARE desktop dashboard showing the main retro operating-system environment.*
 
 ![Boot Screen](https://github.com/user-attachments/assets/6b586ae8-5311-4010-bcdf-29f81f5bbb4e)
 
-*Retro boot sequence introducing the simulated operating system.*
+*Retro boot screen introducing the simulated operating system.*
 
 ![Booting](https://github.com/user-attachments/assets/ac9b8351-e70c-4e6b-b711-c88311fd0941)
 
-*Additional boot-stage interface.*
+*Boot-stage interface and system initialization experience.*
 
 ![Desktop](https://github.com/user-attachments/assets/9b7e161d-7074-45f0-8239-152898d7f744)
 
-*Main Windows 95/98-inspired desktop environment.*
+*Windows 95/98-inspired desktop with applications and system controls.*
 
-![NaaS Application](https://github.com/user-attachments/assets/ef74fa2c-61fc-44e3-8fb3-5328dc2813b3)
+![NaaS](https://github.com/user-attachments/assets/ef74fa2c-61fc-44e3-8fb3-5328dc2813b3)
 
-*NaaS application running inside RAGEWARE.*
+*NaaS running as an embedded web application inside RAGEWARE.*
 
 ![Optical Sensor](https://github.com/user-attachments/assets/36b98d34-789c-4aea-ac56-0373014fc1f0)
 
-*Optical-sensor / computer-vision experience.*
+*Optical/computer-vision interaction experience.*
 
 ![Gesture Drive](https://github.com/user-attachments/assets/de68e577-70ce-460c-9c49-3c573d193210)
 
-*Gesture Drive interaction.*
+*Gesture Drive experiment integrated into the OS.*
 
 ![Additional OS Elements](https://github.com/user-attachments/assets/82931935-70c1-4dc8-91ce-bd99bed99e28)
 
-*Additional OS elements including task manager, music, video, and other applications.*
+*Additional RAGEWARE OS elements and applications.*
 
 # Diagrams
 
-<img width="1376" height="768" alt="RAGEWARE architecture diagram" src="https://github.com/user-attachments/assets/50b76ead-2a44-409b-93ad-34b96e9e8180" />
+### 1. RAGEWARE OS Architecture
 
-*RAGEWARE system architecture and interaction workflow.*
+```mermaid
+flowchart TB
+    U[User Interaction] --> D[RAGEWARE Desktop Shell]
 
-### Real-Time RAGEWARE Mail
+    D --> FS[Virtual File System]
+    D --> APPS[Retro Applications]
+    D --> SND[Sound Engine]
+    D --> PER[OS Personality]
+    D --> R[Interaction Signals]
+
+    R --> RE[RAGE ENGINE]
+
+    RE --> F[Controlled Friction]
+    F --> ERR[Fake Errors]
+    F --> DEL[Artificial Delays]
+    F --> BTN[Dodging / Moving Controls]
+    F --> POP[Extra Dialogs]
+    F --> COM[Sarcastic Commentary]
+
+    APPS --> MAIL[RAGEWARE Mail]
+    APPS --> PAINT[Paint 95]
+    APPS --> NOTE[Notepad 98]
+    APPS --> CALC[Calculator]
+    APPS --> CAL[Calendar]
+    APPS --> BAT[Battery Monitor]
+    APPS --> LOCK[Workstation Lock]
+
+    MAIL <--> WS[Temporary WebSocket Service]
+    WS --> MEM[(Temporary In-Memory Rooms)]
+
+    APPS --> EXT[Embedded External Apps]
+    EXT --> C4K[Caught in 4K]
+    EXT --> NB[NOBROWSE]
+    EXT --> NAAS[NaaS]
+    EXT --> GD[Gesture Drive]
+```
+
+*High-level architecture showing the desktop shell, applications, interaction signals, Rage Engine, and optional integrated services.*
+
+### 2. Rage Engine Interaction Flow
 
 ```mermaid
 flowchart LR
-A[Computer A<br/>RAGEWARE<br/>ADHIL95] <-->|WebSocket| S[Temporary RAGEWARE<br/>Communication Server]
-B[Computer B<br/>RAGEWARE<br/>ALEX95] <-->|WebSocket| S
-S --> M[(Temporary<br/>In-Memory State)]
+    A[User performs action] --> B[Interaction Event]
+    B --> C{Repeated / Failed / Rapid?}
+
+    C -->|No| D[Normal OS Response]
+    C -->|Yes| E[Update Rage State]
+
+    E --> F{Rage Threshold}
+    F -->|Low| G[Subtle Commentary]
+    F -->|Medium| H[Minor Friction]
+    F -->|High| I[Stronger Chaos]
+
+    H --> H1[Delay / Extra Dialog]
+    H --> H2[Label Swap / UI Quirk]
+
+    I --> I1[Dodging Button]
+    I --> I2[Fake Error]
+    I --> I3[Progress Bar Chaos]
+
+    G --> J[OS Personality + Sound]
+    H1 --> J
+    H2 --> J
+    I1 --> J
+    I2 --> J
+    I3 --> J
 ```
 
-*Temporary two-user communication architecture. Active rooms and messages exist only in memory during the session.*
+*Interaction signals are converted into progressively stronger but controlled interface effects.*
 
+### 3. RAGEWARE Mail Real-Time Architecture
 
+```mermaid
+flowchart LR
+    A[Browser A<br/>RAGEWARE<br/>ADHIL95] <-->|WebSocket| S[Temporary<br/>RAGEWARE Server]
+    B[Browser B<br/>RAGEWARE<br/>ALEX95] <-->|WebSocket| S
+    S --> R[Room Code<br/>5 Characters]
+    S --> M[(Temporary<br/>In-Memory Messages)]
+
+    A --> N1[Tray Notification]
+    B --> N2[Tray Notification]
+```
+
+*Temporary two-user communication flow. No permanent mailbox or external email provider is required.*
+
+### 4. RAGEWARE Application Map
+
+```mermaid
+flowchart TB
+    OS[RAGEWARE OS]
+
+    OS --> CORE[Core Desktop]
+    OS --> UTIL[Utility Apps]
+    OS --> MEDIA[Media / Experiments]
+    OS --> AI[AI / Vision Apps]
+    OS --> COMM[Communication]
+
+    CORE --> FS[Virtual FS]
+    CORE --> RE[Rage Engine]
+    CORE --> SP[OS Personality]
+    CORE --> SE[Sound Engine]
+
+    UTIL --> N[Notepad 98]
+    UTIL --> C[Calculator]
+    UTIL --> CA[Calendar]
+    UTIL --> P[Paint 95]
+    UTIL --> B[Battery Monitor]
+    UTIL --> L[Workstation Lock]
+
+    MEDIA --> M1[Media Gallery]
+    MEDIA --> G[Gesture Drive]
+
+    AI --> C4K[Caught in 4K]
+    AI --> NB[NOBROWSE]
+    AI --> NAAS[NaaS]
+
+    COMM --> RM[RAGEWARE Mail]
+```
+
+*Application map showing how the major RAGEWARE components are grouped inside the simulated operating system.*
 
 ### Project Demo
+
 # Video
+
 https://drive.google.com/file/d/1niHrqr2EnIt1GPrBrRRqXgPCinyKPLRD/view?usp=sharing
 
+*The demo demonstrates the RAGEWARE OS environment, retro applications, adaptive chaos, and integrated experiences.*
+
+# Additional Demos
+
+- **Caught in 4K:** https://caught-in-4k-rho.vercel.app/
+- **NOBROWSE™:** https://nobrowser.vercel.app/
 
 ## Team Contributions
-- [Mohamed Arif J]: [Builded The applications in the RagewareOS]
-- [Adhil V T]: [Builded RageWare OS]
+
+- **Mohamed Arif J:** Built the applications and integrated the major interactive experiences inside RAGEWARE OS, including application logic, UI behaviour, and supporting integrations.
+- **Adhil V T:** Built the core RAGEWARE OS desktop environment and integrated the operating-system-level experience.
 
 ---
 
-### Temporary Real-Time RAGEWARE Mail
-
-RAGEWARE Mail is a simulated retro Windows 95/98 communication client allowing two users running RAGEWARE on different browsers or computers to exchange genuine, instant messages in real time.
-
-```mermaid
-flowchart LR
-
-A[Computer A<br/>RAGEWARE<br/>ADHIL95] <-->|WebSocket| S[Temporary RAGEWARE<br/>Communication Server]
-
-B[Computer B<br/>RAGEWARE<br/>ALEX95] <-->|WebSocket| S
-
-S --> M[(Temporary<br/>In-Memory State)]
-```
-
-#### Core Architecture & Features:
-- **Temporary RAGEWARE ID**: Users pick a temporary session ID (e.g. `ADHIL95`, `ALEX95`). No password, no permanent profile, no registration.
-- **Temporary Address**: Displayed as `ADHIL95@RAGEWARE` (simulated address within RAGEWARE, not a real public internet email).
-- **Temporary Session / Room**: Users enter a shared 5-character session room code (e.g. `7K4P9`). Duplicate IDs within the same active room are automatically rejected.
-- **Real-Time WebSocket Protocol**: Direct bidirectional peer delivery. When `ADHIL95` sends a message, `ALEX95` receives it immediately with zero page refresh.
-- **Pure In-Memory State**: Zero database (no PostgreSQL, SQLite, MongoDB, Supabase, or Firebase). All active connections, rooms, and temporary message logs exist strictly in RAM during the active session. When users leave or the server restarts, all data disappears.
-- **No Real Email**: Does not use or touch SMTP, IMAP, Gmail API, Outlook, SendGrid, or OAuth.
-- **Vercel Frontend Compatibility**: The RAGEWARE frontend stays hosted on Vercel as a static client, connecting to the communication server via the configurable `VITE_RAGEWARE_REALTIME_URL` environment variable.
-- **Retro Windows 95/98 Client**: Complete with classic folder navigation (`Inbox`, `Sent`, `Drafts`, `Trash`), reading pane, message composition dialog, reply threads (`Re: ...`), and online user presence.
-- **OS Integration**: Real-time incoming mail displays the classic Windows 95 system tray balloon notification with an `[ OPEN ]` button. Clicking `[ OPEN ]` launches RAGEWARE Mail and highlights the incoming message.
-- **Rage & Personality Synchronization**: Failed recipient lookups feed subtle friction into the `rageEngine`, while repeated refreshes, rapid send attempts, and delivery milestones trigger authentic `osPersonality` reactions.
-
-#### Local Development:
-
-**Terminal 1 — Start the Real-Time Communication Server:**
-```bash
-npm run server
-# Starts WebSocket server on ws://localhost:8000
-```
-
-**Terminal 2 — Start RAGEWARE Frontend:**
-```bash
-npm run dev
-# Starts Vite dev server on http://localhost:5173
-```
-
-#### Two-User Demonstration Flow:
-1. Open **Browser 1** (e.g., Chrome):
-   - Navigate to RAGEWARE OS -> Open **RAGEWARE Mail**.
-   - Enter ID: `ADHIL95`.
-   - Select **Create New Session** (note the 5-character code, e.g. `7K4P9`).
-   - Click **Enter RAGEWARE Mail**.
-2. Open **Browser 2** (e.g., Chrome Incognito or Edge):
-   - Navigate to RAGEWARE OS -> Open **RAGEWARE Mail**.
-   - Enter ID: `ALEX95`.
-   - Select **Join Existing Session** and enter `7K4P9`.
-   - Click **Enter RAGEWARE Mail**.
-3. **Send & Reply**:
-   - Both users will see each other in the `ONLINE USERS` list.
-   - `ADHIL95` clicks **New Msg**, enters `ALEX95@RAGEWARE`, Subject: `Lab Meeting`, Body: `Are you coming to the lab?`, and clicks **SEND**.
-   - `ALEX95` immediately receives a system tray notification (`NEW MAIL From: ADHIL95@RAGEWARE [ OPEN ]`) and the email lands in the Inbox.
-   - `ALEX95` clicks **Reply**, writes `Yes, I'll be there.`, and sends. `ADHIL95` receives the reply immediately.
-
----
-Made with ❤️ at TinkerHub Useless Projects 
+Made with ❤️ at TinkerHub Useless Projects
 
 ![Static Badge](https://img.shields.io/badge/TinkerHub-24?color=%23000000&link=https%3A%2F%2Fwww.tinkerhub.org%2F)
 ![Static Badge](https://img.shields.io/badge/UselessProjects--26-26?link=https%3A%2F%2Ftinkerhub.org%2Fevents%2F1M8ORET9A1%2Fuseless-projects-3.0)
-
-
-
