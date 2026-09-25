@@ -306,6 +306,14 @@ RAGEWARE Mail provides temporary two-user communication inside the retro OS.
 
 *NaaS running as an embedded web application inside RAGEWARE.*
 
+<img width="1535" height="624" alt="image" src="https://github.com/user-attachments/assets/d5b62607-3bcd-4ca9-9148-985ffdae2b75" />
+
+*Mailing system interface in ragewareOS*
+
+<img width="1918" height="912" alt="image" src="https://github.com/user-attachments/assets/12d830ae-003a-401a-abf7-50650f6225c7" />
+
+*Nobrowser interface in ragewareos to provide netwrok usages*
+
 ![Optical Sensor](https://github.com/user-attachments/assets/36b98d34-789c-4aea-ac56-0373014fc1f0)
 
 *Optical/computer-vision interaction experience.*
@@ -448,7 +456,7 @@ flowchart TB
 
 # Video
 
-https://drive.google.com/file/d/1niHrqr2EnIt1GPrBrRRqXgPCinyKPLRD/view?usp=sharing
+https://drive.google.com/file/d/1lMADhUtGo9Z4fDZJv5OB47sGCbQObRlO/view
 
 *The demo demonstrates the RAGEWARE OS environment, retro applications, adaptive chaos, and integrated experiences.*
 
